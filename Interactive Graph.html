@@ -61,6 +61,31 @@
 </style>
 
 <body>
+    <h1 id="test">hello</h1>
+
+    <script>
+        //this.attr("id"))
+        var count = 0;
+        function setId() {
+            d3.select(this).attr("id", "Column" + count);
+            count = count + 1;
+        }
+
+        var SummaryArray = ["summary0", "summary1", "summary2", "summary3", "summary4", "summary5", "summary6", "summary7", "summary8", "summary9", "summary10", "summary11",
+            "summary12", "summary13", "summary14", "summary15", "summary16", "summary17", "summary18", "summary19", "summary20", "summary21", "summary22", "summary23", "summary24", "summary25"];
+
+        var SummaryMap = new Map();
+        for (var i = 0; i < SummmaryArray.length; i++) {
+            elementId = "Column" + i;
+            SummaryMap.set(elementId, SummaryArray[i]);
+        }
+        function textChange(id) {
+            var text = SummaryMap.get(id);
+            document.getElementById("test").innerText = text;
+            playText(text);
+        }
+        $("bar").hover(textChange("Column0"));
+    </script>
     <section id="graph">
 
         <!--Bar graph with-->
@@ -125,8 +150,8 @@
                 svg.selectAll(".bar")
                     .data(data)
                     .enter().append("rect")
+                    .each(setId)
                     .attr("class", "bar")
-                    .attr("id", "x")
                     .attr("x", function (d) { return x(d.letter); })
                     .attr("width", x.rangeBand())
                     .attr("y", function (d) { return y(d.frequency); })
@@ -134,20 +159,21 @@
                     .on('mouseover', tip.show)
                     .on('mouseout', tip.hide)
 
+             
             });
 
             function type(d) {
                 d.frequency = +d.frequency;
                 return d;
             }
+
         </script>
-        <p>hi</p>
     </section>
-    
+
     <!--Text to speech-->
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"
-        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 
     <script src="dist\talkify.js"></script>
     <script>
@@ -160,17 +186,11 @@
             enabled: false,
         };
 
-        $(document).ready(function () {
-            var player = new talkify.TtsPlayer()
-                .enableTextHighlighting();
-            var playlist = new talkify.playlist()
-                .begin()
-                .usingPlayer(player)
-                .withRootSelector('#graph')
-                .withTextInteraction()
-                .build()
-                .play();
-        });
+        var player = new talkify.TtsPlayer();
+
+        function playText(playThis) {
+            player.playText(playThis);
+        }
     </script>
 </body>
 
