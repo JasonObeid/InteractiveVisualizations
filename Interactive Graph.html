@@ -1,12 +1,9 @@
-<html>
-
-<head>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.2/css/all.css" />
-    <link rel="stylesheet" type="text/css" href="../InteractiveVisualizations/styles/talkify-common.css">
-    <link rel="stylesheet" type="text/css" href="../InteractiveVisualizations/styles/talkify-audiocontrols.css">
-</head>
-
 <style>
+    .title {
+        font: 32px helvetica;
+        text-align: center;
+    }
+
     body {
         font: 10px sans-serif;
     }
@@ -60,17 +57,32 @@
         }
 </style>
 
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.2/css/all.css" />
+    <link rel="stylesheet" type="text/css" href="../InteractiveVisualizations/styles/talkify-common.css">
+    <link rel="stylesheet" type="text/css" href="../InteractiveVisualizations/styles/talkify-audiocontrols.css">
+</head>
+
 <body>
     <script>
+        //sets unique id for each d3 element
         var count = 0;
-        var myMap = setMaps();
-        var counter = 0;
-
         function setId() {
             d3.select(this).attr("id", "Column" + count);
             count = count + 1;
         }
 
+        //adds event handler for each d3 element
+        function addHandler() {
+            var id = d3.select(this).attr("id");
+            document.getElementById(id).addEventListener("mouseover", function () {
+                textChange(id);
+            });
+        }
+
+        //creates a map given an array of summaries, 
         function setMaps() {
             var SummaryArray = new Array;
             var SummaryMap = new Map();
@@ -87,12 +99,11 @@
 
         function textChange(id) {
             var text = myMap.get(id);
-            document.getElementById("test").innerText = text;
+            document.getElementById("summaryText").innerText = text;
             playText(text);
-            counter++;
         }
     </script>
-
+    <h1 class="title">Frequency Distribution of Alphabet from file 'Data.tsv'</h1>
     <section id="graph">
 
         <!--Bar graph with-->
@@ -130,7 +141,6 @@
             var svg = d3.select("body").append("svg")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
-                .attr("id", "sav")
                 .append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -143,7 +153,8 @@
                 svg.append("g")
                     .attr("class", "x axis")
                     .attr("transform", "translate(0," + height + ")")
-                    .call(xAxis);
+                    .call(xAxis)
+
 
                 svg.append("g")
                     .attr("class", "y axis")
@@ -159,6 +170,7 @@
                     .data(data)
                     .enter().append("rect")
                     .each(setId)
+                    .each(addHandler)
                     .attr("class", "bar")
                     .attr("x", function (d) { return x(d.letter); })
                     .attr("width", x.rangeBand())
@@ -177,7 +189,7 @@
 
         </script>
     </section>
-    <h1 id="test">hello</h1>
+    <h1 id="summaryText">Hover over a bar to hear its caption</h1>
     <!--Text to speech-->
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"
