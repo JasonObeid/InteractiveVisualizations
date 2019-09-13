@@ -1,12 +1,9 @@
-<html>
-
-<head>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.2/css/all.css" />
-    <link rel="stylesheet" type="text/css" href="../dist/styles/talkify-common.css">
-    <link rel="stylesheet" type="text/css" href="../dist/styles/talkify-audiocontrols.css">
-</head>
-
 <style>
+    .title {
+        font: 32px helvetica;
+        text-align: center;
+    }
+
     body {
         font: 10px sans-serif;
     }
@@ -19,12 +16,11 @@
     }
 
     .bar {
-        fill: orange;
     }
 
-    .bar:hover {
-        fill: orangered;
-    }
+        .bar:hover {
+            fill: #CF6C30;
+        }
 
     .x.axis path {
         display: none;
@@ -39,55 +35,89 @@
         border-radius: 2px;
     }
 
-    /* Creates a small triangle extender for the tooltip */
-    .d3-tip:after {
-        box-sizing: border-box;
-        display: inline;
-        font-size: 10px;
-        width: 100%;
-        line-height: 1;
-        color: rgba(0, 0, 0, 0.8);
-        content: "\25BC";
-        position: absolute;
-        text-align: center;
-    }
+        /* Creates a small triangle extender for the tooltip */
+        .d3-tip:after {
+            box-sizing: border-box;
+            display: inline;
+            font-size: 10px;
+            width: 100%;
+            line-height: 1;
+            color: rgba(0, 0, 0, 0.8);
+            content: "\25BC";
+            position: absolute;
+            text-align: center;
+        }
 
-    /* Style northward tooltips differently */
-    .d3-tip.n:after {
-        margin: -1px 0 0 0;
-        top: 100%;
-        left: 0;
-    }
+        /* Style northward tooltips differently */
+        .d3-tip.n:after {
+            margin: -1px 0 0 0;
+            top: 100%;
+            left: 0;
+        }
 </style>
 
-<body>
-    <h1 id="test">hello</h1>
+<html>
 
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.2/css/all.css" />
+</head>
+
+<body>
     <script>
-        //this.attr("id"))
         var count = 0;
+        var idArray = new Array;
+        //sets unique id for each d3 bar element
         function setId() {
-            d3.select(this).attr("id", "Column" + count);
+            var id = ("Column" + count)
+            idArray.push(id);
+            d3.select(this).attr("id", id);
             count = count + 1;
         }
 
-        var SummaryArray = ["summary0", "summary1", "summary2", "summary3", "summary4", "summary5", "summary6", "summary7", "summary8", "summary9", "summary10", "summary11",
-            "summary12", "summary13", "summary14", "summary15", "summary16", "summary17", "summary18", "summary19", "summary20", "summary21", "summary22", "summary23", "summary24", "summary25"];
-
-        var SummaryMap = new Map();
-        for (var i = 0; i < SummmaryArray.length; i++) {
-            elementId = "Column" + i;
-            SummaryMap.set(elementId, SummaryArray[i]);
+        //adds hover event handler for each d3 bar element
+        function addHandler() {
+            var id = d3.select(this).attr("id");
+            document.getElementById(id).addEventListener("mouseover", function () {
+                textChange(id);
+            });
         }
+
+        //creates a map given an array of summaries. Keys are currently hardcoded
+        function setMaps() {
+            var SummaryArray = new Array;
+            var SummaryMap = new Map();
+            SummaryArray = ["summary0", "summary1", "summary2", "summary3", "summary4", "summary5", "summary6", "summary7", "summary8", "summary9", "summary10", "summary11",
+                "summary12", "summary13", "summary14", "summary15", "summary16", "summary17", "summary18", "summary19", "summary20", "summary21", "summary22", "summary23", "summary24", "summary25"];
+            var len = SummaryArray.length;
+            for (var i = 0; i < len; i++) {
+                elementId = idArray[i];
+                value = SummaryArray[i]
+                SummaryMap.set(elementId, value);
+            }
+            return SummaryMap;
+        }
+
+        //Function for running tts and changing the summary text based on the bar being hovered
         function textChange(id) {
-            var text = SummaryMap.get(id);
-            document.getElementById("test").innerText = text;
+            var myMap = setMaps();
+            var text = myMap.get(id);
+            document.getElementById("summaryText").innerText = text;
             playText(text);
         }
-        $("bar").hover(textChange("Column0"));
+        function minMax(max) {
+            var yVal = d3.select(this).attr("y");
+            if (yVal == max) {
+                d3.select(this).attr("fill", "green");
+            }
+            else {
+                d3.select(this).attr("fill", "orange");
+            }
+        }
     </script>
-    <section id="graph">
 
+
+    <section id="graph">
+        <h1 class="title">Frequency Distribution of Alphabet from file 'Data.tsv'</h1>
         <!--Bar graph with-->
         <script src="http://d3js.org/d3.v3.min.js"></script>
         <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
@@ -135,7 +165,7 @@
                 svg.append("g")
                     .attr("class", "x axis")
                     .attr("transform", "translate(0," + height + ")")
-                    .call(xAxis);
+                    .call(xAxis)
 
                 svg.append("g")
                     .attr("class", "y axis")
@@ -151,6 +181,7 @@
                     .data(data)
                     .enter().append("rect")
                     .each(setId)
+                    .each(addHandler)
                     .attr("class", "bar")
                     .attr("x", function (d) { return x(d.letter); })
                     .attr("width", x.rangeBand())
@@ -158,38 +189,53 @@
                     .attr("height", function (d) { return height - y(d.frequency); })
                     .on('mouseover', tip.show)
                     .on('mouseout', tip.hide)
+                    .attr("fill", "#3093cf");
 
-             
             });
-
             function type(d) {
                 d.frequency = +d.frequency;
                 return d;
             }
-
         </script>
     </section>
+    <h1 id="summaryText">Hover over a bar to hear its caption</h1>
+    <!--Text to speech(requires aws sdk)-->
+    <div id="textToSynth">
+        <input autofocus size="23" type="text" id="textEntry" value="It's very good to meet you." />
+        <button class="btn default" onClick="speakText()">Synthesize</button>
+        <p id="result">Enter text above then click Synthesize</p>
+    </div>
+    <audio id="audioPlayback" controls>
+        <source id="audioSource" type="audio/mp3" src="">
+    </audio>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.410.0.min.js"></script>
+    <script type="text/javascript">
 
-    <!--Text to speech-->
+        // Initialize the Amazon Cognito credentials provider
+        AWS.config.region = 'us-east-1';
+        AWS.config.credentials = new AWS.CognitoIdentityCredentials({ IdentityPoolId: 'us-east-1:1dbc5481-8414-4da8-9fd9-2ecd12443250' });
 
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
-            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+        // Function invoked by button click
+        function speakText() {
+            // Create the JSON parameters for getSynthesizeSpeechUrl
+            var speechParams = {
+                Engine: "neural",
+                OutputFormat: "mp3",
+                SampleRate: "16000",
+                Text: "",
+                TextType: "text",
+                VoiceId: "Joanna"
+            };
+            speechParams.Text = document.getElementById("textEntry").value;
 
-    <script src="dist\talkify.js"></script>
-    <script>
-        talkify.config.keyboardCommands.enabled = true;
-        talkify.config.voiceCommands.enabled = true;
-        talkify.config.remoteService.host = 'https://talkify.net';
-        talkify.config.remoteService.apiKey = '0a2cf5c2-c9b6-42b4-98a7-6cf22ed40bca';
+            // Create the Polly service object and presigner object
+            var polly = new AWS.Polly({ apiVersion: '2016-06-10' });
 
-        talkify.config.ui.audioControls = {
-            enabled: false,
-        };
-
-        var player = new talkify.TtsPlayer();
-
-        function playText(playThis) {
-            player.playText(playThis);
+            // Create presigned URL of synthesized speech file
+            polly.synthesizeSpeech(params, function (err, data) {
+                if (err) console.log(err, err.stack); // an error occurred
+                else console.log(data); 
+            });
         }
     </script>
 </body>
