@@ -62,29 +62,39 @@
 
 <body>
     <h1 id="test">hello</h1>
-
+    <button id="btn" onclick="textChange()">hello</button>
+    
     <script>
-        //this.attr("id"))
+        document.getElementById("btn").addEventListener("click", maps());
+
         var count = 0;
         function setId() {
             d3.select(this).attr("id", "Column" + count);
             count = count + 1;
         }
 
-        var SummaryArray = ["summary0", "summary1", "summary2", "summary3", "summary4", "summary5", "summary6", "summary7", "summary8", "summary9", "summary10", "summary11",
-            "summary12", "summary13", "summary14", "summary15", "summary16", "summary17", "summary18", "summary19", "summary20", "summary21", "summary22", "summary23", "summary24", "summary25"];
-
-        var SummaryMap = new Map();
-        for (var i = 0; i < SummmaryArray.length; i++) {
-            elementId = "Column" + i;
-            SummaryMap.set(elementId, SummaryArray[i]);
+        function maps() {
+            var SummaryArray = new Array("summary0", "summary1", "summary2", "summary3", "summary4", "summary5", "summary6", "summary7", "summary8", "summary9", "summary10", "summary11",
+            "summary12", "summary13", "summary14", "summary15", "summary16", "summary17", "summary18", "summary19", "summary20", "summary21", "summary22", "summary23", "summary24", "summary25");
+            //window.alert("test4");
+            var SummaryMap = new Map();
+            for (var i = 0; i < 25; i++) {
+                //window.alert("test4");
+                elementId = "Column" + i;
+                SummaryMap.set(elementId, SummaryArray[i]);
+            }
         }
-        function textChange(id) {
+        
+        function textChange() {
+            
+            id = SummaryArray[1];
+            window.alert("test");
             var text = SummaryMap.get(id);
+            
             document.getElementById("test").innerText = text;
             playText(text);
         }
-        $("bar").hover(textChange("Column0"));
+        $(".bar").hover(textChange("Column0"));
     </script>
     <section id="graph">
 
@@ -159,7 +169,7 @@
                     .on('mouseover', tip.show)
                     .on('mouseout', tip.hide)
 
-             
+
             });
 
             function type(d) {
