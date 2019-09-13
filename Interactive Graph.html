@@ -16,11 +16,10 @@
     }
 
     .bar {
-        fill: orange;
     }
 
         .bar:hover {
-            fill: orangered;
+            fill: #CF6C30;
         }
 
     .x.axis path {
@@ -107,9 +106,18 @@
             document.getElementById("summaryText").innerText = text;
             playText(text);
         }
+        function minMax(max) {
+            var yVal = d3.select(this).attr("y");
+            if (yVal == max) {
+                d3.select(this).attr("fill", "green");
+            }
+            else {
+                d3.select(this).attr("fill", "orange");
+            }
+        }
     </script>
 
-    
+
     <section id="graph">
         <h1 class="title">Frequency Distribution of Alphabet from file 'Data.tsv'</h1>
         <!--Bar graph with-->
@@ -151,7 +159,7 @@
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
             svg.call(tip);
-
+            
             d3.tsv("data.tsv", type, function (error, data) {
                 x.domain(data.map(function (d) { return d.letter; }));
                 y.domain([0, d3.max(data, function (d) { return d.frequency; })]);
@@ -170,7 +178,7 @@
                     .attr("dy", ".71em")
                     .style("text-anchor", "end")
                     .text("Frequency");
-
+                
                 svg.selectAll(".bar")
                     .data(data)
                     .enter().append("rect")
@@ -183,14 +191,13 @@
                     .attr("height", function (d) { return height - y(d.frequency); })
                     .on('mouseover', tip.show)
                     .on('mouseout', tip.hide)
+                    .attr("fill", "#3093cf");
 
             });
-
             function type(d) {
                 d.frequency = +d.frequency;
                 return d;
             }
-
         </script>
     </section>
     <h1 id="summaryText">Hover over a bar to hear its caption</h1>
