@@ -102,8 +102,9 @@
             var myMap = setMaps();
             var text = myMap.get(id);
             document.getElementById("summaryText").innerText = text;
-            playText(text);
+            speakText(text);
         }
+
         function minMax(max) {
             var yVal = d3.select(this).attr("y");
             if (yVal == max) {
@@ -115,6 +116,40 @@
         }
     </script>
 
+    <!--Text to speech-->
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.410.0.min.js"></script>
+    <script type="text/javascript">
+
+        // Initialize the Amazon Cognito credentials provider
+        AWS.config.region = 'us-east-1';
+        AWS.config.credentials = new AWS.CognitoIdentityCredentials({ IdentityPoolId: 'us-east-1:1dbc5481-8414-4da8-9fd9-2ecd12443250' });
+        function speakText(passedText) {
+            // Create the JSON parameters for getSynthesizeSpeechUrl
+            var speechParams = {
+                OutputFormat: "mp3",
+                //Engine: "standard",
+                SampleRate: "16000",
+                Text: passedText,
+                TextType: "text",
+                VoiceId: "Matthew"
+            };
+
+            // Create the Polly service object and presigner object
+            var polly = new AWS.Polly({ apiVersion: '2016-06-10' });
+            var signer = new AWS.Polly.Presigner(speechParams, polly)
+
+            // Create presigned URL of synthesized speech file
+            signer.getSynthesizeSpeechUrl(speechParams, function (error, url) {
+                if (error) {
+                    window.alert("AWS Polly error" + error);
+                } else {
+                    document.getElementById('audioSource').src = url;
+                    document.getElementById('audioPlayback').load();
+                    document.getElementById('audioPlayback').play();
+                }
+            });
+        }
+    </script>
 
     <section id="graph">
         <h1 class="title">Frequency Distribution of Alphabet from file 'Data.tsv'</h1>
@@ -199,51 +234,11 @@
         </script>
     </section>
     <h1 id="summaryText">Hover over a bar to hear its caption</h1>
-    <!--Text to speech(requires aws sdk)-->
-    <div id="textToSynth">
-        <input autofocus size="23" type="text" id="textEntry" value="It's very good to meet you." />
-        <button class="btn default" onClick="speakText()">Synthesize</button>
-        <p id="result">Enter text above then click Synthesize</p>
-    </div>
+
     <audio id="audioPlayback" controls>
         <source id="audioSource" type="audio/mp3" src="">
     </audio>
-    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.410.0.min.js"></script>
-    <script type="text/javascript">
 
-        // Initialize the Amazon Cognito credentials provider
-        AWS.config.region = 'us-east-1';
-        AWS.config.credentials = new AWS.CognitoIdentityCredentials({ IdentityPoolId: 'us-east-1:1dbc5481-8414-4da8-9fd9-2ecd12443250' });
-
-        // Function invoked by button click
-        function speakText() {
-            // Create the JSON parameters for getSynthesizeSpeechUrl
-            var speechParams = {
-                OutputFormat: "mp3",
-                SampleRate: "16000",
-                Text: "",
-                Engine: "neural",
-                TextType: "text",
-                VoiceId: "Joanna"
-            };
-            speechParams.Text = document.getElementById("textEntry").value;
-
-            // Create the Polly service object and presigner object
-            var polly = new AWS.Polly({ apiVersion: '2016-06-10' });
-            var signer = new AWS.Polly.Presigner(speechParams, polly)
-
-            // Create presigned URL of synthesized speech file
-            signer.getSynthesizeSpeechUrl(speechParams, function (error, url) {
-                if (error) {
-                    document.getElementById('result').innerHTML = error;
-                } else {
-                    document.getElementById('audioSource').src = url;
-                    document.getElementById('audioPlayback').load();
-                    document.getElementById('result').innerHTML = "Speech ready to play.";
-                }
-            });
-        }
-    </script>
 </body>
 
-</html>
+</html >
