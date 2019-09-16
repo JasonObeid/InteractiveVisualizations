@@ -60,8 +60,6 @@
 
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.2/css/all.css" />
-    <link rel="stylesheet" type="text/css" href="../InteractiveVisualizations/styles/talkify-common.css">
-    <link rel="stylesheet" type="text/css" href="../InteractiveVisualizations/styles/talkify-audiocontrols.css">
 </head>
 
 <body>
@@ -159,7 +157,7 @@
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
             svg.call(tip);
-            
+
             d3.tsv("data.tsv", type, function (error, data) {
                 x.domain(data.map(function (d) { return d.letter; }));
                 y.domain([0, d3.max(data, function (d) { return d.frequency; })]);
@@ -178,7 +176,7 @@
                     .attr("dy", ".71em")
                     .style("text-anchor", "end")
                     .text("Frequency");
-                
+
                 svg.selectAll(".bar")
                     .data(data)
                     .enter().append("rect")
@@ -201,28 +199,49 @@
         </script>
     </section>
     <h1 id="summaryText">Hover over a bar to hear its caption</h1>
-    <!--Text to speech(requires jquery)-->
+    <!--Text to speech(requires aws sdk)-->
+    <div id="textToSynth">
+        <input autofocus size="23" type="text" id="textEntry" value="It's very good to meet you." />
+        <button class="btn default" onClick="speakText()">Synthesize</button>
+        <p id="result">Enter text above then click Synthesize</p>
+    </div>
+    <audio id="audioPlayback" controls>
+        <source id="audioSource" type="audio/mp3" src="">
+    </audio>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.410.0.min.js"></script>
+    <script type="text/javascript">
 
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
-            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+        // Initialize the Amazon Cognito credentials provider
+        AWS.config.region = 'us-east-1';
+        AWS.config.credentials = new AWS.CognitoIdentityCredentials({ IdentityPoolId: 'us-east-1:1dbc5481-8414-4da8-9fd9-2ecd12443250' });
 
-    <script src="dist\talkify.js"></script>
-    <script>
-        //configuring tts library
-        talkify.config.keyboardCommands.enabled = true;
-        talkify.config.voiceCommands.enabled = true;
-        talkify.config.remoteService.host = 'https://talkify.net';
-        talkify.config.remoteService.apiKey = '0a2cf5c2-c9b6-42b4-98a7-6cf22ed40bca';
+        // Function invoked by button click
+        function speakText() {
+            // Create the JSON parameters for getSynthesizeSpeechUrl
+            var speechParams = {
+                OutputFormat: "mp3",
+                SampleRate: "16000",
+                Text: "",
+                Engine: "neural",
+                TextType: "text",
+                VoiceId: "Joanna"
+            };
+            speechParams.Text = document.getElementById("textEntry").value;
 
-        talkify.config.ui.audioControls = {
-            enabled: false,
-        };
+            // Create the Polly service object and presigner object
+            var polly = new AWS.Polly({ apiVersion: '2016-06-10' });
+            var signer = new AWS.Polly.Presigner(speechParams, polly)
 
-        var player = new talkify.TtsPlayer();
-
-        //simple function to play text
-        function playText(playThis) {
-            player.playText(playThis);
+            // Create presigned URL of synthesized speech file
+            signer.getSynthesizeSpeechUrl(speechParams, function (error, url) {
+                if (error) {
+                    document.getElementById('result').innerHTML = error;
+                } else {
+                    document.getElementById('audioSource').src = url;
+                    document.getElementById('audioPlayback').load();
+                    document.getElementById('result').innerHTML = "Speech ready to play.";
+                }
+            });
         }
     </script>
 </body>
