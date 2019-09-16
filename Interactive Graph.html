@@ -117,19 +117,19 @@
     </script>
 
     <!--Text to speech-->
-    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.410.0.min.js"></script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.529.0.min.js"></script>
     <script type="text/javascript">
 
         // Initialize the Amazon Cognito credentials provider
         AWS.config.region = 'us-east-1';
         AWS.config.credentials = new AWS.CognitoIdentityCredentials({ IdentityPoolId: 'us-east-1:1dbc5481-8414-4da8-9fd9-2ecd12443250' });
-        function speakText(passedText) {
+        function speakText(text) {
             // Create the JSON parameters for getSynthesizeSpeechUrl
             var speechParams = {
                 OutputFormat: "mp3",
-                //Engine: "standard",
+                Engine: "neural",
                 SampleRate: "16000",
-                Text: passedText,
+                Text: text,
                 TextType: "text",
                 VoiceId: "Matthew"
             };
@@ -141,7 +141,7 @@
             // Create presigned URL of synthesized speech file
             signer.getSynthesizeSpeechUrl(speechParams, function (error, url) {
                 if (error) {
-                    window.alert("AWS Polly error" + error);
+                    window.alert("AWS Polly error");
                 } else {
                     document.getElementById('audioSource').src = url;
                     document.getElementById('audioPlayback').load();
