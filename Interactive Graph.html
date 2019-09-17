@@ -193,14 +193,15 @@
 
             svg.call(tip);
 
-            d3.tsv("data.tsv", type, function (error, data) {
-                x.domain(data.map(function (d) { return d.letter; }));
-                y.domain([0, d3.max(data, function (d) { return d.frequency; })]);
+            d3.csv("data/d3/data/2998_0.csv", type, function (error, data) {
+                x.domain(data.map(function (d) { return d.transportation; }));
+                y.domain([0, d3.max(data, function (d) { return d.ridership; })]);
 
                 svg.append("g")
                     .attr("class", "x axis")
                     .attr("transform", "translate(0," + height + ")")
                     .call(xAxis)
+                    .text("xAXis");
 
                 svg.append("g")
                     .attr("class", "y axis")
@@ -210,7 +211,7 @@
                     .attr("y", 6)
                     .attr("dy", ".71em")
                     .style("text-anchor", "end")
-                    .text("Frequency");
+                    .text("y axis");
 
                 svg.selectAll(".bar")
                     .data(data)
@@ -218,17 +219,17 @@
                     .each(setId)
                     .each(addHandler)
                     .attr("class", "bar")
-                    .attr("x", function (d) { return x(d.letter); })
+                    .attr("x", function (d) { return x(d.transportation); })
                     .attr("width", x.rangeBand())
-                    .attr("y", function (d) { return y(d.frequency); })
-                    .attr("height", function (d) { return height - y(d.frequency); })
+                    .attr("y", function (d) { return y(d.ridership); })
+                    .attr("height", function (d) { return height - y(d.ridership); })
                     .on('mouseover', tip.show)
                     .on('mouseout', tip.hide)
                     .attr("fill", "#3093cf");
 
             });
             function type(d) {
-                d.frequency = +d.frequency;
+                d.ridership = +d.ridership;
                 return d;
             }
         </script>
