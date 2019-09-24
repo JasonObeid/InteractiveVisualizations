@@ -34,7 +34,6 @@
         color: #fff;
         border-radius: 2px;
     }
-
         /* Creates a small triangle extender for the tooltip */
         .d3-tip:after {
             box-sizing: border-box;
@@ -47,7 +46,6 @@
             position: absolute;
             text-align: center;
         }
-
         /* Style northward tooltips differently */
         .d3-tip.n:after {
             margin: -1px 0 0 0;
@@ -73,7 +71,6 @@
             d3.select(this).attr("id", id);
             count = count + 1;
         }
-
         //adds hover event handler for each d3 bar element
         function addHandler() {
             var id = d3.select(this).attr("id");
@@ -81,7 +78,6 @@
                 textChange(id);
             });
         }
-
         //creates a map given an array of summaries. Keys are currently hardcoded
         function setMaps() {
             var SummaryArray = new Array;
@@ -96,7 +92,6 @@
             }
             return SummaryMap;
         }
-
         //Function for running tts and changing the summary text based on the bar being hovered
         function textChange(id) {
             var myMap = setMaps();
@@ -104,7 +99,6 @@
             document.getElementById("summaryText").innerText = text;
             speakText(text);
         }
-
         function minMax(max) {
             var yVal = d3.select(this).attr("y");
             if (yVal == max) {
@@ -114,12 +108,30 @@
                 d3.select(this).attr("fill", "orange");
             }
         }
+
+        var requestURL = 'https://raw.githubusercontent.com/ymsun118/chartSummarization/master/data/d3/specs/2756_0.json?token=AKZAOTY54HBX4QZD4RCFLUS5SOI7U';
+        var request = new XMLHttpRequest();
+        request.open('GET', requestURL);
+        request.responseType = 'json';
+        request.send();
+
+        request.onload = function () {
+            var jsonObj = request.response;
+
+            var yAxisField = jsonObj['encoding']["y"];
+            var yAxisData = jsonObj['data']["y"];
+            var xAxisField = jsonObj['encoding']["x"];
+            var xAxisData = jsonObj['data']["x"];
+            console.log(yAxisField);
+            console.log(yAxisData);
+            console.log(xAxisField);
+            console.log(xAxisData);
+        }
     </script>
 
     <!--Text to speech-->
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.529.0.min.js"></script>
     <script type="text/javascript">
-
         // Initialize the Amazon Cognito credentials provider
         AWS.config.region = 'us-east-1';
         AWS.config.credentials = new AWS.CognitoIdentityCredentials({ IdentityPoolId: 'us-east-1:1dbc5481-8414-4da8-9fd9-2ecd12443250' });
@@ -133,11 +145,9 @@
                 TextType: "text",
                 VoiceId: "Matthew"
             };
-
             // Create the Polly service object and presigner object
             var polly = new AWS.Polly({ apiVersion: '2016-06-10' });
             var signer = new AWS.Polly.Presigner(speechParams, polly)
-
             // Create presigned URL of synthesized speech file
             signer.getSynthesizeSpeechUrl(speechParams, function (error, url) {
                 if (error) {
@@ -157,81 +167,65 @@
         <script src="http://d3js.org/d3.v3.min.js"></script>
         <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
         <script>
-            var margin = { top: 20, right: 20, bottom: 70, left: 40 },
-                width = 600 - margin.left - margin.right,
-                height = 300 - margin.top - margin.bottom;
-
-            x = d3.scale.ordinal().rangeRoundBands([0, width], .05);
-            y = d3.scale.linear().range([height, 0]);
-
+            var margin = { top: 40, right: 20, bottom: 30, left: 40 },
+                width = 960 - margin.left - margin.right,
+                height = 500 - margin.top - margin.bottom;
+            var formatPercent = d3.format(".0%");
+            var x = d3.scale.ordinal()
+                .rangeRoundBands([0, width], .1);
+            var y = d3.scale.linear()
+                .range([height, 0]);
             var xAxis = d3.svg.axis()
                 .scale(x)
-                .orient("bottom")
-
+                .orient("bottom");
             var yAxis = d3.svg.axis()
                 .scale(y)
                 .orient("left")
-                .ticks(10);
-
+                .tickFormat(formatPercent);
             var tip = d3.tip()
                 .attr('class', 'd3-tip')
                 .offset([-10, 0])
                 .html(function (d) {
                     return "<strong>Frequency:</strong> <span style='color:red'>" + d.frequency + "</span>";
                 })
-
             var svg = d3.select("body").append("svg")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
                 .append("g")
-                .attr("transform",
-                    "translate(" + margin.left + "," + margin.top + ")");
-
-            
-
-                d3.csv.parse('JasonObeid\InteractiveVisualizations\data\d3\data\2756_0.csv', function (data){
-                    console.log(data);
-                });
-
-                    x.domain(data.map(function (d) { return d[xAxisField]; }));
-                    y.domain([0, d3.max(data, function (d) { return d[yAxisField]; })]);
-
-                    svg.append("g")
-                        .attr("class", "x axis")
-                        .attr("transform", "translate(0," + height + ")")
-                        .call(xAxis)
-                        .selectAll("text")
-                        .style("text-anchor", "end")
-                        .attr("dx", "-.8em")
-                        .attr("dy", "-.55em")
-                        .attr("transform", "rotate(-90)");
-
-                    svg.append("g")
-                        .attr("class", "y axis")
-                        .call(yAxis)
-                        .append("text")
-                        .attr("transform", "rotate(-90)")
-                        .attr("y", 6)
-                        .attr("dy", ".71em")
-                        .style("text-anchor", "end")
-                        .text(yAxisField)
-
-                    svg.selectAll("bar")
-                        .data(data)
-                        .enter().append("rect")
-                        .each(setId)
-                        .each(addHandler)
-                        .attr("class", "bar")
-                        .on('mouseover', tip.show)
-                        .on('mouseout', tip.hide)
-                        .style("fill", "steelblue")
-                        .attr("x", function (d) { return x(d[xAxisField]); })
-                        .attr("width", x.rangeBand())
-                        .attr("y", function (d) { return y(d[yAxisField]); })
-                        .attr("height", function (d) { return height - y(d[yAxisField]); });
-                });
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            svg.call(tip);
+            d3.csv("2998_0.csv", type, function (error, data) {
+                x.domain(data.map(function (d) { return d.letter; }));
+                y.domain([0, d3.max(data, function (d) { return d.frequency; })]);
+                svg.append("g")
+                    .attr("transform", "translate(0," + height + ")")
+                    .call(xAxis)
+                svg.append("g")
+                    .call(yAxis)
+                    .append("text")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", 6)
+                    .attr("dy", ".71em")
+                    .style("text-anchor", "end")
+                    .text("Frequency");
+                svg.selectAll(".bar")
+                    .data(data)
+                    .enter().append("rect")
+                    .each(setId)
+                    .each(addHandler)
+                    .attr("class", "bar")
+                    .attr("x", function (d) { return x(d.letter); })
+                    .attr("width", x.rangeBand())
+                    .attr("y", function (d) { return y(d.frequency); })
+                    .attr("height", function (d) { return height - y(d.frequency); })
+                    .on('mouseover', tip.show)
+                    .on('mouseout', tip.hide)
+                    .attr("fill", "#3093cf");
+            });
+            function type(d) {
+                d.frequency = +d.frequency;
+                return d;
             }
-        
         </script>
     </section>
     <h1 id="summaryText">Hover over a bar to hear its caption</h1>
@@ -242,4 +236,4 @@
 
 </body>
 
-</html >
+</html>
