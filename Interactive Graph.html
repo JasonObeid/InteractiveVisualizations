@@ -188,24 +188,11 @@
                 .attr("transform",
                     "translate(" + margin.left + "," + margin.top + ")");
 
-            var requestURL = 'https://raw.githubusercontent.com/ymsun118/chartSummarization/master/data/d3/specs/2756_0.json?token=AKZAOTY54HBX4QZD4RCFLUS5SOI7U';
-            var request = new XMLHttpRequest();
-            request.open('GET', requestURL);
-            request.responseType = 'json';
-            request.send();
+            
 
-            request.onload = function () {
-                var jsonObj = request.response;
-
-                var yAxisField = jsonObj['encoding']["y"]["field"];
-                var xAxisField = jsonObj['encoding']["x"]["field"];
-
-                d3.csv('/data/d3/data/2756_0.csv', function (error, data) {
-
-                    data.forEach(function (d) {
-                        d[xAxisField] = d[xAxisField];
-                        d[yAxisField] = +d[yAxisField];
-                    });
+                d3.csv.parse('JasonObeid\InteractiveVisualizations\data\d3\data\2756_0.csv', function (data){
+                    console.log(data);
+                });
 
                     x.domain(data.map(function (d) { return d[xAxisField]; }));
                     y.domain([0, d3.max(data, function (d) { return d[yAxisField]; })]);
