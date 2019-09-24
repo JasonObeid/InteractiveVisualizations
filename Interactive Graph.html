@@ -86,7 +86,7 @@
         function setMaps() {
             var SummaryArray = new Array;
             var SummaryMap = new Map();
-            SummaryArray = ["This is a test for AWS Polly using the neural matthew voice", "summary1", "summary2", "summary3", "summary4", "summary5", "summary6", "summary7", "summary8", "summary9", "summary10", "summary11",
+            SummaryArray = ["summary0", "summary1", "summary2", "summary3", "summary4", "summary5", "summary6", "summary7", "summary8", "summary9", "summary10", "summary11",
                 "summary12", "summary13", "summary14", "summary15", "summary16", "summary17", "summary18", "summary19", "summary20", "summary21", "summary22", "summary23", "summary24", "summary25"];
             var len = SummaryArray.length;
             for (var i = 0; i < len; i++) {
@@ -142,8 +142,7 @@
             signer.getSynthesizeSpeechUrl(speechParams, function (error, url) {
                 if (error) {
                     window.alert("AWS Polly error");
-                }
-                else {
+                } else {
                     document.getElementById('audioSource').src = url;
                     document.getElementById('audioPlayback').load();
                     document.getElementById('audioPlayback').play();
@@ -243,4 +242,4 @@
 
 </body>
 
-</html>
+</html >
