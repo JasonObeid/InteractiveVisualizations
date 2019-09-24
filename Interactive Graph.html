@@ -86,7 +86,7 @@
         function setMaps() {
             var SummaryArray = new Array;
             var SummaryMap = new Map();
-            SummaryArray = ["summary0", "summary1", "summary2", "summary3", "summary4", "summary5", "summary6", "summary7", "summary8", "summary9", "summary10", "summary11",
+            SummaryArray = ["This is a test for AWS Polly using the neural matthew voice", "summary1", "summary2", "summary3", "summary4", "summary5", "summary6", "summary7", "summary8", "summary9", "summary10", "summary11",
                 "summary12", "summary13", "summary14", "summary15", "summary16", "summary17", "summary18", "summary19", "summary20", "summary21", "summary22", "summary23", "summary24", "summary25"];
             var len = SummaryArray.length;
             for (var i = 0; i < len; i++) {
@@ -142,7 +142,8 @@
             signer.getSynthesizeSpeechUrl(speechParams, function (error, url) {
                 if (error) {
                     window.alert("AWS Polly error");
-                } else {
+                }
+                else {
                     document.getElementById('audioSource').src = url;
                     document.getElementById('audioPlayback').load();
                     document.getElementById('audioPlayback').play();
@@ -157,26 +158,21 @@
         <script src="http://d3js.org/d3.v3.min.js"></script>
         <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
         <script>
-            var margin = { top: 40, right: 20, bottom: 30, left: 40 },
-                width = 960 - margin.left - margin.right,
-                height = 500 - margin.top - margin.bottom;
+            var margin = { top: 20, right: 20, bottom: 70, left: 40 },
+                width = 600 - margin.left - margin.right,
+                height = 300 - margin.top - margin.bottom;
 
-            var formatPercent = d3.format(".0%");
-
-            var x = d3.scale.ordinal()
-                .rangeRoundBands([0, width], .1);
-
-            var y = d3.scale.linear()
-                .range([height, 0]);
+            x = d3.scale.ordinal().rangeRoundBands([0, width], .05);
+            y = d3.scale.linear().range([height, 0]);
 
             var xAxis = d3.svg.axis()
                 .scale(x)
-                .orient("bottom");
+                .orient("bottom")
 
             var yAxis = d3.svg.axis()
                 .scale(y)
                 .orient("left")
-                .tickFormat(formatPercent);
+                .ticks(10);
 
             var tip = d3.tip()
                 .attr('class', 'd3-tip')
@@ -189,49 +185,67 @@
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
                 .append("g")
-                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                .attr("transform",
+                    "translate(" + margin.left + "," + margin.top + ")");
 
-            svg.call(tip);
+            var requestURL = 'https://raw.githubusercontent.com/ymsun118/chartSummarization/master/data/d3/specs/2756_0.json?token=AKZAOTY54HBX4QZD4RCFLUS5SOI7U';
+            var request = new XMLHttpRequest();
+            request.open('GET', requestURL);
+            request.responseType = 'json';
+            request.send();
 
-            d3.csv("data/d3/data/2998_0.csv", type, function (error, data) {
-                x.domain(data.map(function (d) { return d.transportation; }));
-                y.domain([0, d3.max(data, function (d) { return d.ridership; })]);
+            request.onload = function () {
+                var jsonObj = request.response;
 
-                svg.append("g")
-                    .attr("class", "x axis")
-                    .attr("transform", "translate(0," + height + ")")
-                    .call(xAxis)
-                    .text("xAXis");
+                var yAxisField = jsonObj['encoding']["y"]["field"];
+                var xAxisField = jsonObj['encoding']["x"]["field"];
 
-                svg.append("g")
-                    .attr("class", "y axis")
-                    .call(yAxis)
-                    .append("text")
-                    .attr("transform", "rotate(-90)")
-                    .attr("y", 6)
-                    .attr("dy", ".71em")
-                    .style("text-anchor", "end")
-                    .text("y axis");
+                d3.csv('/data/d3/data/2756_0.csv', function (error, data) {
 
-                svg.selectAll(".bar")
-                    .data(data)
-                    .enter().append("rect")
-                    .each(setId)
-                    .each(addHandler)
-                    .attr("class", "bar")
-                    .attr("x", function (d) { return x(d.transportation); })
-                    .attr("width", x.rangeBand())
-                    .attr("y", function (d) { return y(d.ridership); })
-                    .attr("height", function (d) { return height - y(d.ridership); })
-                    .on('mouseover', tip.show)
-                    .on('mouseout', tip.hide)
-                    .attr("fill", "#3093cf");
+                    data.forEach(function (d) {
+                        d[xAxisField] = d[xAxisField];
+                        d[yAxisField] = +d[yAxisField];
+                    });
 
-            });
-            function type(d) {
-                d.ridership = +d.ridership;
-                return d;
+                    x.domain(data.map(function (d) { return d[xAxisField]; }));
+                    y.domain([0, d3.max(data, function (d) { return d[yAxisField]; })]);
+
+                    svg.append("g")
+                        .attr("class", "x axis")
+                        .attr("transform", "translate(0," + height + ")")
+                        .call(xAxis)
+                        .selectAll("text")
+                        .style("text-anchor", "end")
+                        .attr("dx", "-.8em")
+                        .attr("dy", "-.55em")
+                        .attr("transform", "rotate(-90)");
+
+                    svg.append("g")
+                        .attr("class", "y axis")
+                        .call(yAxis)
+                        .append("text")
+                        .attr("transform", "rotate(-90)")
+                        .attr("y", 6)
+                        .attr("dy", ".71em")
+                        .style("text-anchor", "end")
+                        .text(yAxisField)
+
+                    svg.selectAll("bar")
+                        .data(data)
+                        .enter().append("rect")
+                        .each(setId)
+                        .each(addHandler)
+                        .attr("class", "bar")
+                        .on('mouseover', tip.show)
+                        .on('mouseout', tip.hide)
+                        .style("fill", "steelblue")
+                        .attr("x", function (d) { return x(d[xAxisField]); })
+                        .attr("width", x.rangeBand())
+                        .attr("y", function (d) { return y(d[yAxisField]); })
+                        .attr("height", function (d) { return height - y(d[yAxisField]); });
+                });
             }
+        
         </script>
     </section>
     <h1 id="summaryText">Hover over a bar to hear its caption</h1>
@@ -242,4 +256,4 @@
 
 </body>
 
-</html >
+</html>
