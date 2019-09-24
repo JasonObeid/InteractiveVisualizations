@@ -1,0 +1,22 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v3.0.0-rc4.json",
+    "encoding": {
+        "y": {
+            "field": "Population",
+            "type": "nominal",
+            "sort":null
+        },
+        "color": {
+            "field": "condition",
+            "type": "nominal"
+        },
+        "x": {
+            "field": "value",
+            "type": "quantitative"
+        }
+    },
+    "data": {
+        "url": "data/kong/data/66.csv"
+    },
+    "mark": "bar"
+}
