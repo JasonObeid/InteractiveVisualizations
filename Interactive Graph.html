@@ -200,7 +200,7 @@
                 var yAxisField = jsonObj['encoding']["y"]["field"];
                 var xAxisField = jsonObj['encoding']["x"]["field"];
 
-                d3.csv("https://github.com/ymsun118/chartSummarization/raw/master/data/d3/data/2756_0.csv", function (error, data) {
+                d3.csv('/data/d3/data/2756_0.csv', function (error, data) {
 
                     data.forEach(function (d) {
                         d[xAxisField] = d[xAxisField];

@@ -1,7 +1,11 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\data",
+    "\\data\\d3",
+    "\\data\\d3\\data",
+    "\\data\\d3\\specs"
   ],
-  "SelectedNode": "\\aws-sdk.min.js",
+  "SelectedNode": "\\data\\d3\\data\\2756_0.csv",
   "PreviewInSolutionExplorer": false
 }
