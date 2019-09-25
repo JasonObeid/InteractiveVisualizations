@@ -3,8 +3,9 @@
     "",
     "\\data",
     "\\data\\d3",
-    "\\data\\d3\\data"
+    "\\data\\d3\\data",
+    "\\data\\d3\\specs"
   ],
-  "SelectedNode": "\\data\\d3\\data\\2836_3.csv",
+  "SelectedNode": "\\2998_0.csv",
   "PreviewInSolutionExplorer": false
 }
