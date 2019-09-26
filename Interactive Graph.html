@@ -82,7 +82,7 @@
         function setMaps() {
             var SummaryArray = new Array;
             var SummaryMap = new Map();
-            SummaryArray = ["JASTIN IS A CUTIE", "summary1", "summary2", "summary3", "summary4", "summary5", "summary6", "summary7", "summary8", "summary9", "summary10", "summary11",
+            SummaryArray = ["summary0", "summary1", "summary2", "summary3", "summary4", "summary5", "summary6", "summary7", "summary8", "summary9", "summary10", "summary11",
                 "summary12", "summary13", "summary14", "summary15", "summary16", "summary17", "summary18", "summary19", "summary20", "summary21", "summary22", "summary23", "summary24", "summary25"];
             var len = SummaryArray.length;
             for (var i = 0; i < len; i++) {
@@ -108,24 +108,28 @@
                 d3.select(this).attr("fill", "orange");
             }
         }
-
-        var requestURL = 'https://raw.githubusercontent.com/ymsun118/chartSummarization/master/data/d3/specs/2998_0.json?token=AKZAOT22I2NN7MYE4AHKC4S5SPVX4';
-        var request = new XMLHttpRequest();
-        request.open('GET', requestURL);
-        request.responseType = 'json';
-        request.send();
-
-        request.onload = function () {
-            var jsonObj = request.response;
-
-            var yAxisField = jsonObj['encoding']["y"]["field"];
-            var yAxisData = jsonObj['data']["y"];
-            var xAxisField = jsonObj['encoding']["x"]["field"];
-            var xAxisData = jsonObj['data']["x"];
-            console.log(yAxisField);
-            console.log(yAxisData);
-            console.log(xAxisField);
-            console.log(xAxisData);
+        function getMetaData() {
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    var myObj = JSON.parse(this.responseText);
+                    test = myObj['encoding']["y"]["field"];
+                    test1 = myObj['encoding']["x"]["field"];
+                    test2 = myObj['mark'];
+                    setAxes(test, test1, test2);
+                }
+            };
+            xmlhttp.open("GET", "2998_0.json", true);
+            xmlhttp.send();
+        }
+        function setX(x) {
+            return x;
+        }
+        function setY(y) {
+            return y;
+        }
+        function setMark(mark) {
+            return mark;
         }
     </script>
 
@@ -167,65 +171,87 @@
         <script src="http://d3js.org/d3.v3.min.js"></script>
         <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
         <script>
-            var margin = { top: 40, right: 20, bottom: 30, left: 40 },
-                width = 960 - margin.left - margin.right,
-                height = 500 - margin.top - margin.bottom;
-            var formatPercent = d3.format(".0%");
-            var x = d3.scale.ordinal()
-                .rangeRoundBands([0, width], .1);
-            var y = d3.scale.linear()
-                .range([height, 0]);
-            var xAxis = d3.svg.axis()
-                .scale(x)
-                .orient("bottom");
-            var yAxis = d3.svg.axis()
-                .scale(y)
-                .orient("left")
-                .tickFormat(formatPercent);
-            var tip = d3.tip()
-                .attr('class', 'd3-tip')
-                .offset([-10, 0])
-                .html(function (d) {
-                    return "<strong>Frequency:</strong> <span style='color:red'>" + d.frequency + "</span>";
-                })//find how to use xAxisField instead of hard coded axis name
-            var svg = d3.select("body").append("svg")
-                .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom)
-                .append("g")
-                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-            svg.call(tip);
-            d3.csv("2998_0.csv", type, function (error, data) {
-                x.domain(data.map(function (d) { return d.xAxisField; }));
-                y.domain([0, d3.max(data, function (d) { return d.yAxisField; })]);
-                svg.append("g")
-                    .attr("transform", "translate(0," + height + ")")
-                    .call(xAxis)
-                svg.append("g")
-                    .call(yAxis)
-                    .append("text")
-                    .attr("transform", "rotate(-90)")
-                    .attr("y", 6)
-                    .attr("dy", ".71em")
-                    .style("text-anchor", "end")
-                    .text("Frequency");
-                svg.selectAll(".bar")
-                    .data(data)
-                    .enter().append("rect")
-                    .each(setId)
-                    .each(addHandler)
-                    .attr("class", "bar")
-                    .attr("x", function (d) { return x(d.AxisField); })
-                    .attr("width", x.rangeBand())
-                    .attr("y", function (d) { return y(d.yAxisField); })
-                    .attr("height", function (d) { return height - y(d.yAxisField); })
-                    .on('mouseover', tip.show)
-                    .on('mouseout', tip.hide)
-                    .attr("fill", "#3093cf");
-            });
-            function type(d) {
-                d.frequency = +d.frequency;
-                return d;
+            getMetaData();
+            //console.log(xAxis);
+            function createGraph(fileName, type, xName, yName) {
+
+                var margin = { top: 40, right: 20, bottom: 30, left: 40 },
+                    width = 960 - margin.left - margin.right,
+                    height = 500 - margin.top - margin.bottom;
+
+                if (type == "")
+                    var formatPercent = d3.format(".0%");
+
+                var x = d3.scale.ordinal()
+                    .rangeRoundBands([0, width], .1);
+
+                var y = d3.scale.linear()
+                    .range([height, 0]);
+
+                var xAxis = d3.svg.axis()
+                    .scale(x)
+                    .orient("bottom");
+
+                var yAxis = d3.svg.axis()
+                    .scale(y)
+                    .orient("left")
+                    .tickFormat(formatPercent);
+
+                var tip = d3.tip()
+                    .attr('class', 'd3-tip')
+                    .offset([-10, 0])
+                    .html(function (d) {
+                        return "<strong>" + yName + ":</strong> <span style='color:red'>" + d.revenue + "</span>";
+                    })
+
+                var svg = d3.select("body").append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+                svg.call(tip);
+
+                d3.csv(fileName, type, function (error, data) {
+                    x.domain(data.map(function (d) { return d.year; }));
+                    y.domain([0, d3.max(data, function (d) { return d.revenue; })]);
+                    console.log(data);
+                    svg.append("g")
+                        .attr("class", "x axis")
+                        .attr("transform", "translate(0," + height + ")")
+                        .call(xAxis)
+
+                    svg.append("g")
+                        .attr("class", "y axis")
+                        .call(yAxis)
+                        .append("text")
+                        .attr("transform", "rotate(-90)")
+                        .attr("y", 6)
+                        .attr("dy", ".71em")
+                        .style("text-anchor", "end")
+                        .text(yName);
+
+                    svg.selectAll(".bar")
+                        .data(data)
+                        .enter().append("rect")
+                        .each(setId)
+                        .each(addHandler)
+                        .attr("class", "bar")
+                        .attr("x", function (d) { return x(d.year); })
+                        .attr("width", x.rangeBand())
+                        .attr("y", function (d) { return y(d.revenue); })
+                        .attr("height", function (d) { return height - y(d.revenue); })
+                        .on('mouseover', tip.show)
+                        .on('mouseout', tip.hide)
+                        .attr("fill", "#3093cf");
+
+                });
+                function type(d) {
+                    d.revenue = +d.revenue;
+                    return d;
+                }
             }
+            createGraph("3001_0.csv", "line", "year", "revenue");
         </script>
     </section>
     <h1 id="summaryText">Hover over a bar to hear its caption</h1>
