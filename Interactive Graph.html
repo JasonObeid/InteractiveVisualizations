@@ -120,6 +120,8 @@
                 xAxis = jsonObj['encoding']["x"]["field"];
                 setX(xAxis);
                 setY(yAxis);
+                //@todo 
+                //map.get(d3.keys(d)[1]);
             }
         }
         function setX(x) {
@@ -127,6 +129,7 @@
         }
         function setY(y) {
             yAxisField = y;
+
         }
     </script>
 
@@ -205,8 +208,9 @@
 
             d3.csv("2998_0.csv", type, function (error, data) {
                 x.domain(data.map(function (d) {
-                    // try this: 
-                    console.log(d3.entries(d)[1]); // the data element
+                    // try this:
+                    console.log(d3.keys(d)[1]); // the data element
+                    console.log(d3.keys(d)[0]);
                     return d.transportation;
                 }));
                 y.domain([0, d3.max(data, function (d) { return d.ridership; })]);
