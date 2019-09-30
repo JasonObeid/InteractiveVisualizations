@@ -204,7 +204,11 @@
             svg.call(tip);
 
             d3.csv("2998_0.csv", type, function (error, data) {
-                x.domain(data.map(function (d) { return d.transportation; }));
+                x.domain(data.map(function (d) {
+                    // try this: 
+                    console.log(d3.entries(d)[1]); // the data element
+                    return d.transportation;
+                }));
                 y.domain([0, d3.max(data, function (d) { return d.ridership; })]);
                 console.log(data);
                 svg.append("g")
@@ -219,8 +223,7 @@
                     .attr("transform", "rotate(-90)")
                     .attr("y", 6)
                     .attr("dy", ".71em")
-                    .style("text-anchor", "end")
-                    .text("ridership");
+                    .style("text-anchor", "end");
 
                 svg.selectAll(".bar")
                     .data(data)
