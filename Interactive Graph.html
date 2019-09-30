@@ -214,7 +214,10 @@
                     .each(setId)
                     .each(addHandler)
                     .attr("class", "bar")
-                    .attr("x", function (d) { return x(d.AxisField); })
+                    .attr("x", function (d) {
+                        var returns = "d." + xAxisField; 
+                        return x(returns);
+                    })
                     .attr("width", x.rangeBand())
                     .attr("y", function (d) { return y(d.yAxisField); })
                     .attr("height", function (d) { return height - y(d.yAxisField); })
