@@ -120,17 +120,15 @@
                 xAxis = jsonObj['encoding']["x"]["field"];
                 setX(xAxis);
                 setY(yAxis);
-                //@todo
+                //@todo 
                 //map.get(d3.keys(d)[1]);
             }
         }
-        function getX() {
-            xAxisName = d3.keys(d)[1];
-            return xAxisName;
+        function setX(x) {
+            xAxisField = x;
         }
-        function getY() {
-            yAxisName = d3.keys(d)[0];
-            return yAxisName;
+        function setY(y) {
+            yAxisField = y;
 
         }
     </script>
@@ -172,8 +170,7 @@
         <!--Bar graph with-->
         <script src="http://d3js.org/d3.v3.min.js"></script>
         <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
-        <script>
-            var margin = { top: 40, right: 20, bottom: 30, left: 40 },
+        <script>var margin = { top: 40, right: 20, bottom: 30, left: 40 },
                 width = 960 - margin.left - margin.right,
                 height = 500 - margin.top - margin.bottom;
 
@@ -211,13 +208,12 @@
 
             d3.csv("2998_0.csv", type, function (error, data) {
                 x.domain(data.map(function (d) {
-                    var xAxis = getX();
-                    return d[xAxis];
+                    // try this:
+                    console.log(d3.keys(d)[1]); // the data element
+                    console.log(d3.keys(d)[0]);
+                    return d.transportation;
                 }));
-                y.domain([0, d3.max(data, function (d) {
-                    var yAxis = getY();
-                    return d[yAxis];
-                })]);
+                y.domain([0, d3.max(data, function (d) { return d.ridership; })]);
                 console.log(data);
                 svg.append("g")
                     .attr("class", "x axis")
@@ -239,26 +235,17 @@
                     .each(setId)
                     .each(addHandler)
                     .attr("class", "bar")
-                    .attr("x", function (d) {
-                        var yAxis = getY();
-                        return d[yAxis];
-                    })
+                    .attr("x", function (d) { return x(d.transportation); })
                     .attr("width", x.rangeBand())
-                    .attr("y", function (d) {
-                        var yAxis = getY();
-                        return y(d[yAxis]);
-                    })
-                    .attr("height", function (d) {
-                        var xAxis = getX();
-                        return height - y(d[xAxis]);
-                    })
+                    .attr("y", function (d) { return y(d.ridership); })
+                    .attr("height", function (d) { return height - y(d.ridership); })
                     .on('mouseover', tip.show)
                     .on('mouseout', tip.hide)
                     .attr("fill", "#3093cf");
+
             });
             function type(d) {
-                var xAxis = getX();
-                d[xAxis] = +d[xAxis];
+                d.ridership = +d.ridership;
                 return d;
             }
         </script>
