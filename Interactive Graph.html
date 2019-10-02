@@ -118,8 +118,6 @@
                 var jsonObj = request.response;
                 yAxis = jsonObj['encoding']["y"]["field"];
                 xAxis = jsonObj['encoding']["x"]["field"];
-                setX(xAxis);
-                setY(yAxis);
                 //@todo 
                 //map.get(d3.keys(d)[1]);
             }
@@ -169,33 +167,25 @@
     <section id="graph">
         <h1 class="title">Frequency Distribution of Alphabet from file 'Data.tsv'</h1>
         <!--Bar graph with-->
-        <script src="http://d3js.org/d3.v3.min.js"></script>
-        <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+        <script src="d3-tip.js"></script>
         <script>
-            var margin = { top: 40, right: 20, bottom: 30, left: 40 },
+            var margin = { top: 40, right: 80, bottom: 30, left: 90 },
                 width = 960 - margin.left - margin.right,
-                height = 500 - margin.top - margin.bottom;
+                height = 600 - margin.top - margin.bottom;
             
-            var x = d3.scale.ordinal()
-                .rangeRoundBands([0, width], .1);
+            var x = d3.scaleBand()
+                .rangeRound([0, width])
+                .padding(0.1);
 
-            var y = d3.scale.linear()
-                .range([height, 0]);
-
-            var xAxis = d3.svg.axis()
-                .scale(x)
-                .orient("bottom");
-
-            var yAxis = d3.svg.axis()
-                .scale(y)
-                .orient("left")
-                .tickFormat(0, 100, 10);
-
+            var y = d3.scaleLinear()
+                .rangeRound([height, 0]);
+       
             var tip = d3.tip()
                 .attr('class', 'd3-tip')
                 .offset([-10, 0])
                 .html(function (d) {
-                    return "<strong>ridership:</strong> <span style='color:red'>" + d.ridership + "</span>";
+                    return "<strong> " + getY(d) +":</strong> <span style='color:red'>" + d[getY(d)] + "</span>";
                 })
 
             var svg = d3.select("body").append("svg")
@@ -206,21 +196,21 @@
 
             svg.call(tip);
 
-            d3.csv("2998_0.csv", type, function (error, data) {
+            d3.csv("2998_0.csv").then(function (data) {
                 x.domain(data.map(function (d) {
+                    console.log(d[getX(d)]);
                     return d[getX(d)];
                 }));
                 y.domain([0, d3.max(data, function (d) {
-                    return d[getY(d)];
+                    console.log(d[getY(d)]);
+                    return d3.format(".1e")(d[getY(d)]);
                 })]);
                 svg.append("g")
-                    .attr("class", "x axis")
                     .attr("transform", "translate(0," + height + ")")
-                    .call(xAxis)
+                    .call(d3.axisBottom(x));
 
                 svg.append("g")
-                    .attr("class", "y axis")
-                    .call(yAxis)
+                    .call(d3.axisLeft(y))
                     .append("text")
                     .attr("transform", "rotate(-90)")
                     .attr("y", 6)
@@ -236,7 +226,7 @@
                     .attr("x", function (d) {
                         return x(d[getX(d)]);
                     })
-                    .attr("width", x.rangeBand())
+                    .attr("width", x.bandwidth())
                     .attr("y", function (d) {
                         return y(d[getY(d)]);
                     })
@@ -248,10 +238,6 @@
                     .attr("fill", "#3093cf");
 
             });
-            function type(d) {
-                d.ridership = +d.ridership;
-                return d;
-            }
         </script>
     </section>
     <h1 id="summaryText">Hover over a bar to hear its caption</h1>
