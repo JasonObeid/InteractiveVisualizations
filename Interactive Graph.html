@@ -62,6 +62,14 @@
 
 <body>
     <script>
+        function run(graphType) {
+            if (graphType == "line") {
+                lineGraph();
+            }
+            else if (graphType == "bar") {
+                barGraph();
+            }
+        }
         var count = 0;
         var idArray = new Array;
         //sets unique id for each d3 bar element
@@ -100,18 +108,20 @@
             speakText(text);
         }
         function getMetaData() {
-            var requestURL = "2998_0.json";
+            var requestURL = "3001_1.json";
             var request = new XMLHttpRequest();
             request.open('GET', requestURL);
             request.responseType = 'json';
             request.send();
             request.onload = function () {
                 var jsonObj = request.response;
-                yAxis = jsonObj['encoding']["y"]["field"];
-                xAxis = jsonObj['encoding']["x"]["field"];
-                //@todo 
+                //yAxis = jsonObj['encoding']["y"]["field"];
+                //xAxis = jsonObj['encoding']["x"]["field"];
+                graphType = jsonObj['mark'];
+                console.log(graphType);
                 //map.get(d3.keys(d)[1]);
             }
+            return graphtype;
         }
         function getX(d) {
             xAxisName = d3.keys(d)[0];
@@ -161,74 +171,151 @@
         <script src="https://d3js.org/d3.v5.min.js"></script>
         <script src="d3-tip.js"></script>
         <script>
-            var margin = { top: 40, right: 80, bottom: 30, left: 90 },
-                width = 960 - margin.left - margin.right,
-                height = 600 - margin.top - margin.bottom;
-            
-            var x = d3.scaleBand()
-                .rangeRound([0, width])
-                .padding(0.1);
+            function lineGraph() {
+                console.log("here");
+                var parseDate = d3.timeParse("%m/ % d /% Y");
 
-            var y = d3.scaleLinear()
-                .rangeRound([height, 0]);
-       
-            var tip = d3.tip()
-                .attr('class', 'd3-tip')
-                .offset([-10, 0])
-                .html(function (d) {
-                    return "<strong> " + getY(d) +":</strong> <span style='color:red'>" + d[getY(d)] + "</span>";
-                })
+                var margin = { left: 50, right: 20, top: 20, bottom: 50 };
 
-            var svg = d3.select("body").append("svg")
-                .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom)
-                .append("g")
-                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                var width = 960 - margin.left - margin.right;
+                var height = 500 - margin.top - margin.bottom;
 
-            svg.call(tip);
 
-            d3.csv("7920_0.csv").then(function (data) {
-                x.domain(data.map(function (d) {
-                    console.log(d[getX(d)]);
-                    return d[getX(d)];
-                }));
-                y.domain([0, d3.max(data, function (d) {
-                    console.log(d[getY(d)]);
-                    return d3.format(".1e")(d[getY(d)]);
-                })]);
-                svg.append("g")
-                    .attr("transform", "translate(0," + height + ")")
-                    .call(d3.axisBottom(x));
+                var max = 0;
 
-                svg.append("g")
-                    .call(d3.axisLeft(y))
-                    .append("text")
-                    .attr("transform", "rotate(-90)")
-                    .attr("y", 6)
-                    .attr("dy", ".71em")
-                    .style("text-anchor", "end");
+                var xNudge = 50;
+                var yNudge = 20;
 
-                svg.selectAll(".bar")
-                    .data(data)
-                    .enter().append("rect")
-                    .each(setId)
-                    .each(addHandler)
-                    .attr("class", "bar")
-                    .attr("x", function (d) {
-                        return x(d[getX(d)]);
+                var minDate = new Date();
+                var maxDate = new Date();
+                
+                d3.csv("3001_1.csv").then(function (data) {
+                    data.row(function (d) {
+                        return {
+                            month: parseDate(d[getX(d)]), price: Number(d[getY(d)].trim().slice(1))
+                        };
                     })
-                    .attr("width", x.bandwidth())
-                    .attr("y", function (d) {
-                        return y(d[getY(d)]);
+                    data.get(function (error, rows) {
+                        max = d3.max(rows, function (d) {
+                            return d[getX(d)];
+                        });
+                        minDate = d3.min(rows, function (d) {
+                            return d[getY(d)];
+                        });
+                        maxDate = d3.max(rows, function (d) {
+                            return d[getY(d)];
+                        });
                     })
-                    .attr("height", function (d) {
-                        return height - y(d[getY(d)]);
-                    })
-                    .on('mouseover', tip.show)
-                    .on('mouseout', tip.hide)
-                    .attr("fill", "#3093cf");
 
-            });
+                    var y = d3.scaleLinear()
+                        .domain([0, max])
+                        .range([height, 0]);
+
+                    var x = d3.scaleTime()
+                        .domain([minDate, maxDate])
+                        .range([0, width]);
+
+                    var yAxis = d3.axisLeft(y);
+
+                    var xAxis = d3.axisBottom(x);
+
+                    var line = d3.line()
+                        .x(function (d) { return x(d[getX(d)]); })
+                        .y(function (d) { return y(d[getY(d)]); })
+                        .curve(d3.curveCardinal);
+
+
+                    var svg = d3.select("body").append("svg").attr("id", "svg").attr("height", "100%").attr("width", "100%");
+                    var chartGroup = svg.append("g").attr("class", "chartGroup").attr("transform", "translate(" + xNudge + "," + yNudge + ")");
+
+                    chartGroup.append("path")
+                        .attr("class", "line")
+                        .attr("d", function (d) { return line(rows); })
+
+
+                    chartGroup.append("g")
+                        .attr("class", "axis x")
+                        .attr("transform", "translate(0," + height + ")")
+                        .call(xAxis);
+
+                    chartGroup.append("g")
+                        .attr("class", "axis y")
+                        .call(yAxis);
+
+                });
+            }
+                    
+            function barGraph() {
+                var margin = { top: 40, right: 80, bottom: 30, left: 90 },
+                    width = 960 - margin.left - margin.right,
+                    height = 600 - margin.top - margin.bottom;
+
+                var x = d3.scaleBand()
+                    .rangeRound([0, width])
+                    .padding(0.1);
+
+                var y = d3.scaleLinear()
+                    .rangeRound([height, 0]);
+
+                var tip = d3.tip()
+                    .attr('class', 'd3-tip')
+                    .offset([-10, 0])
+                    .html(function (d) {
+                        return "<strong> " + getY(d) + ":</strong> <span style='color:red'>" + d[getY(d)] + "</span>";
+                    })
+
+                var svg = d3.select("body").append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+                svg.call(tip);
+
+                d3.csv("3001_1.csv").then(function (data) {
+                    x.domain(data.map(function (d) {
+                        return d[getX(d)];
+                    }));
+                    y.domain([0, d3.max(data, function (d) {
+                        return d3.format(".1e")(d[getY(d)]);
+                    })]);
+                    svg.append("g")
+                        .attr("transform", "translate(0," + height + ")")
+                        .call(d3.axisBottom(x));
+
+                    svg.append("g")
+                        .call(d3.axisLeft(y))
+                        .append("text")
+                        .attr("transform", "rotate(-90)")
+                        .attr("y", 6)
+                        .attr("dy", ".71em")
+                        .style("text-anchor", "end");
+
+                    svg.selectAll(".bar")
+                        .data(data)
+                        .enter().append("rect")
+                        .each(setId)
+                        .each(addHandler)
+                        .attr("class", "bar")
+                        .attr("x", function (d) {
+                            return x(d[getX(d)]);
+                        })
+                        .attr("width", x.bandwidth())
+                        .attr("y", function (d) {
+                            return y(d[getY(d)]);
+                        })
+                        .attr("height", function (d) {
+                            return height - y(d[getY(d)]);
+                        })
+                        .on('mouseover', tip.show)
+                        .on('mouseout', tip.hide)
+                        .attr("fill", "#3093cf");
+
+                });
+            }
+            //var graphType = getMetaData();
+            //console.log(graphType);
+            run("line");
         </script>
     </section>
     <h1 id="summaryText">Hover over a bar to hear its caption</h1>
