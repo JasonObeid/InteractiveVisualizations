@@ -62,13 +62,18 @@
 
 <body>
     <script>
-        function run(graphType) {
+        function run(x, y, graphType) {
+            setTitle(x, y, graphType);
             if (graphType == "line") {
                 lineGraph();
             }
             else if (graphType == "bar") {
                 barGraph();
             }
+        }
+        function setTitle(x, y, graph) {
+            var title = graph + " graph of " + x + " at " + y;
+            document.getElementById('title').innerText = title;
         }
         var count = 0;
         var idArray = new Array;
@@ -107,6 +112,7 @@
             document.getElementById("summaryText").innerText = text;
             speakText(text);
         }
+
         function getMetaData() {
             var requestURL = "3001_1.json";
             var request = new XMLHttpRequest();
@@ -115,13 +121,11 @@
             request.send();
             request.onload = function () {
                 var jsonObj = request.response;
-                //yAxis = jsonObj['encoding']["y"]["field"];
-                //xAxis = jsonObj['encoding']["x"]["field"];
+                yAxis = jsonObj['encoding']["y"]["field"];
+                xAxis = jsonObj['encoding']["x"]["field"];
                 graphType = jsonObj['mark'];
-                console.log(graphType);
-                //map.get(d3.keys(d)[1]);
+                run(xAxis, yAxis, graphType);
             }
-            return graphtype;
         }
         function getX(d) {
             xAxisName = d3.keys(d)[0];
@@ -166,85 +170,73 @@
     </script>
 
     <section id="graph">
-        <h1 class="title">Frequency Distribution of Alphabet from file 'Data.tsv'</h1>
+        <h1 id="title"></h1>
         <!--Bar graph with-->
         <script src="https://d3js.org/d3.v5.min.js"></script>
         <script src="d3-tip.js"></script>
         <script>
+            getMetaData();
             function lineGraph() {
-                console.log("here");
-                var parseDate = d3.timeParse("%m/ % d /% Y");
 
-                var margin = { left: 50, right: 20, top: 20, bottom: 50 };
+                var margin = { top: 10, right: 30, bottom: 30, left: 60 },
+                    width = 1000 - margin.left - margin.right,
+                    height = 600 - margin.top - margin.bottom;
 
-                var width = 960 - margin.left - margin.right;
-                var height = 500 - margin.top - margin.bottom;
+                // append the svg object to the body of the page
+                var svg = d3.select("body")
+                    .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform",
+                        "translate(" + margin.left + "," + margin.top + ")");
 
-
-                var max = 0;
-
-                var xNudge = 50;
-                var yNudge = 20;
-
-                var minDate = new Date();
-                var maxDate = new Date();
-                
+                //Read the data
                 d3.csv("3001_1.csv").then(function (data) {
-                    data.row(function (d) {
-                        return {
-                            month: parseDate(d[getX(d)]), price: Number(d[getY(d)].trim().slice(1))
-                        };
-                    })
-                    data.get(function (error, rows) {
-                        max = d3.max(rows, function (d) {
-                            return d[getX(d)];
-                        });
-                        minDate = d3.min(rows, function (d) {
-                            return d[getY(d)];
-                        });
-                        maxDate = d3.max(rows, function (d) {
-                            return d[getY(d)];
-                        });
-                    })
-
-                    var y = d3.scaleLinear()
-                        .domain([0, max])
-                        .range([height, 0]);
-
-                    var x = d3.scaleTime()
-                        .domain([minDate, maxDate])
+                    var x = d3.scaleBand()
+                        .domain(data.map(function (d) { return d[getX(d)]; }))
                         .range([0, width]);
-
-                    var yAxis = d3.axisLeft(y);
-
-                    var xAxis = d3.axisBottom(x);
-
-                    var line = d3.line()
-                        .x(function (d) { return x(d[getX(d)]); })
-                        .y(function (d) { return y(d[getY(d)]); })
-                        .curve(d3.curveCardinal);
-
-
-                    var svg = d3.select("body").append("svg").attr("id", "svg").attr("height", "100%").attr("width", "100%");
-                    var chartGroup = svg.append("g").attr("class", "chartGroup").attr("transform", "translate(" + xNudge + "," + yNudge + ")");
-
-                    chartGroup.append("path")
-                        .attr("class", "line")
-                        .attr("d", function (d) { return line(rows); })
-
-
-                    chartGroup.append("g")
-                        .attr("class", "axis x")
+                    svg.append("g")
                         .attr("transform", "translate(0," + height + ")")
-                        .call(xAxis);
+                        .call(d3.axisBottom(x));
 
-                    chartGroup.append("g")
-                        .attr("class", "axis y")
-                        .call(yAxis);
+                    // Add Y axis
+                    var y = d3.scaleLinear()
+                        .domain([0, d3.max(data, function (d) { return +d[getY(d)]; })])
+                        .range([height, 0]);
+                    svg.append("g")
+                        .call(d3.axisLeft(y));
 
+                    var tip = d3.tip()
+                        .attr('class', 'd3-tip')
+                        .offset([-10, 0])
+                        .html(function (d) {
+                            return "<strong> " + getY(d) + ":</strong> <span style='color:red'>" + d[getY(d)] + "</span>";
+                        })
+                    svg.call(tip);
+                    // Add the line
+                    svg.append("path")
+                        .datum(data)
+                        .attr("fill", "none")
+                        .attr("stroke", "steelblue")
+                        .attr("stroke-width", 1.5)
+                        .attr("d", d3.line()
+                            .x(function (d) { return x(d[getX(d)]) })
+                            .y(function (d) { return y(d[getY(d)]) })
+                        );
+                    svg.selectAll("svg")
+                        .data(data)
+                        .enter().append("circle")
+                        .attr("class", "dot") // Assign a class for styling
+                        .attr("cx", function (d, i) { return x(d[getX(d)]) })
+                        .attr("cy", function (d) { return y(d[getY(d)]) })
+                        .attr("r", 5)
+                        .attr("fill", "grey")
+                        .on('mouseover', tip.show)
+                        .on('mouseout', tip.hide);
                 });
             }
-                    
+
             function barGraph() {
                 var margin = { top: 40, right: 80, bottom: 30, left: 90 },
                     width = 960 - margin.left - margin.right,
@@ -313,9 +305,6 @@
 
                 });
             }
-            //var graphType = getMetaData();
-            //console.log(graphType);
-            run("line");
         </script>
     </section>
     <h1 id="summaryText">Hover over a bar to hear its caption</h1>
