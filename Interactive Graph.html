@@ -85,30 +85,34 @@
             count = count + 1;
         }
         //adds hover event handler for each d3 bar element
-        function addHandler() {
+        function addHandler(data) {
             var id = d3.select(this).attr("id");
-            document.getElementById(id).addEventListener("mouseover", function () {
-                textChange(id);
-            });
+            console.log(id);
+            console.log(data);
+            //document.getElementById(id).addEventListener("mouseover", function () {
+            //    textChange(id);
+            //});
         }
         //creates a map given an array of summaries. Values are currently hardcoded
-        function setMaps() {
-            var SummaryArray = new Array;
-            var SummaryMap = new Map();
-            SummaryArray = ["summary0", "summary1", "summary2", "summary3", "summary4", "summary5", "summary6", "summary7", "summary8", "summary9", "summary10", "summary11",
-                "summary12", "summary13", "summary14", "summary15", "summary16", "summary17", "summary18", "summary19", "summary20", "summary21", "summary22", "summary23", "summary24", "summary25"];
-            var len = SummaryArray.length;
-            for (var i = 0; i < len; i++) {
-                elementId = idArray[i];
-                value = SummaryArray[i]
-                SummaryMap.set(elementId, value);
-            }
-            return SummaryMap;
-        }
+        //function setMaps() {
+        //    var SummaryArray = new Array;
+        //    var SummaryMap = new Map();
+        //    //var string = y + yvalue + " at " + x + xvalue;
+        //    SummaryArray = ["summary0", "summary1", "summary2", "summary3", "summary4", "summary5", "summary6", "summary7", "summary8", "summary9", "summary10", "summary11",
+        //        "summary12", "summary13", "summary14", "summary15", "summary16", "summary17", "summary18", "summary19", "summary20", "summary21", "summary22", "summary23", "summary24", "summary25"];
+        //    var len = SummaryArray.length;
+        //    for (var i = 0; i < len; i++) {
+        //        elementId = idArray[i];
+        //        value = SummaryArray[i]
+        //        SummaryMap.set(elementId, value);
+        //    }
+        //    return SummaryMap;
+        //}
         //Function for running tts and changing the summary text based on the bar being hovered
         function textChange(id) {
-            var myMap = setMaps();
-            var text = myMap.get(id);
+            //var myMap = setMaps();
+            //var text = myMap.get(id);
+            var text = "test";
             document.getElementById("summaryText").innerText = text;
             speakText(text);
         }
@@ -224,7 +228,7 @@
                             .x(function (d) { return x(d[getX(d)]) })
                             .y(function (d) { return y(d[getY(d)]) })
                         );
-                    svg.selectAll("svg")
+                    svg.selectAll(".dot")
                         .data(data)
                         .enter().append("circle")
                         .attr("class", "dot") // Assign a class for styling
@@ -233,7 +237,9 @@
                         .attr("r", 5)
                         .attr("fill", "grey")
                         .on('mouseover', tip.show)
-                        .on('mouseout', tip.hide);
+                        .on('mouseout', tip.hide)
+                        .each(setId)
+                        .each(addHandler(data));
                 });
             }
 
