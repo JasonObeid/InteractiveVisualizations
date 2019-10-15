@@ -64,6 +64,9 @@
     <script>
         var xAxis = "";
         var yAxis = "";
+        var jsonPath = "2756_0.json";
+        var csvPath = "2756_0.csv";
+
         function run(x, y, graphType) {
             xAxis = x.replace(/_/g, " ");
             yAxis = y.replace(/_/g, " ");
@@ -123,7 +126,7 @@
         }
 
         function getMetaData() {
-            var requestURL = "2998_0.json";
+            var requestURL = jsonPath;
             var request = new XMLHttpRequest();
             request.open('GET', requestURL);
             request.responseType = 'json';
@@ -137,11 +140,11 @@
             }
         }
         function getX(d) {
-            xAxisName = d3.keys(d)[0];
+            xAxisName = d3.keys(d)[1];
             return xAxisName;
         }
         function getY(d) {
-            yAxisName = d3.keys(d)[1];
+            yAxisName = d3.keys(d)[0];
             return yAxisName;
         }
     </script>
@@ -201,7 +204,7 @@
                         "translate(" + margin.left + "," + margin.top + ")");
 
                 //Read the data
-                d3.csv("2998_0.csv").then(function (data) {
+                d3.csv(csvPath).then(function (data) {
                     var x = d3.scaleBand()
                         .domain(data.map(function (d) { return d[getX(d)]; }))
                         .range([0, width]);
@@ -275,12 +278,12 @@
 
                 svg.call(tip);
 
-                d3.csv("2998_0.csv").then(function (data) {
+                d3.csv(csvPath).then(function (data) {
                     x.domain(data.map(function (d) {
                         return d[getX(d)];
                     }));
                     y.domain([0, d3.max(data, function (d) {
-                        return d3.format(".1e")(d[getY(d)]);
+                        return (d[getY(d)]);
                     })]);
                     svg.append("g")
                         .attr("transform", "translate(0," + height + ")")
@@ -298,16 +301,16 @@
                         .data(data)
                         .enter().append("rect")
                         .attr("class", "bar")
-                        .attr("height", function (d) {
-                            return y(d[getY(d)]);
-                        })
                         .attr("x", function (d) {
                             return x(d[getX(d)]);
                         })
+                        .attr("width", x.bandwidth())
                         .attr("y", function (d) {
                             return y(d[getY(d)]);
                         })
-                        .attr("width", x.bandwidth())
+                        .attr("height", function (d) {
+                            return y(d[getY(d)]);
+                        })
                         .attr("xVal", function (d) { return d[getX(d)] })
                         .attr("yVal", function (d) { return d[getY(d)] })
                         .on('mouseover', tip.show)
