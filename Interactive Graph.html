@@ -62,8 +62,12 @@
 
 <body>
     <script>
+        var xAxis = "";
+        var yAxis = "";
         function run(x, y, graphType) {
-            setTitle(x, y, graphType);
+            xAxis = x.replace(/_/g, " ");
+            yAxis = y.replace(/_/g, " ");
+            setTitle(xAxis, yAxis, graphType);
             if (graphType == "line") {
                 lineGraph();
             }
@@ -76,28 +80,32 @@
             document.getElementById('title').innerText = title;
         }
         var count = 0;
-        var idArray = new Array;
+        //var idArray = new Array;
         //sets unique id for each d3 bar element
         function setId() {
             var id = ("Column" + count)
-            idArray.push(id);
+            //idArray.push(id);
             d3.select(this).attr("id", id);
+            xValue = d3.select(this).attr("xVal");
+            yValue = d3.select(this).attr("yVal");
+            var string = yAxis + " is " + yValue + " at " + xAxis + " " + xValue;
+            document.getElementById(id).addEventListener("mouseover", function () {
+                textChange(string);
+            });
             count = count + 1;
         }
         //adds hover event handler for each d3 bar element
-        function addHandler(data) {
-            var id = d3.select(this).attr("id");
-            console.log(id);
-            console.log(data);
-            //document.getElementById(id).addEventListener("mouseover", function () {
-            //    textChange(id);
-            //});
-        }
+        //function addHandler(data) {
+        //    var id = d3.select(this).attr("id");
+        //    console.log(id);
+        //    console.log(data);
+        //
+        //}
         //creates a map given an array of summaries. Values are currently hardcoded
         //function setMaps() {
         //    var SummaryArray = new Array;
         //    var SummaryMap = new Map();
-        //    //var string = y + yvalue + " at " + x + xvalue;
+        //
         //    SummaryArray = ["summary0", "summary1", "summary2", "summary3", "summary4", "summary5", "summary6", "summary7", "summary8", "summary9", "summary10", "summary11",
         //        "summary12", "summary13", "summary14", "summary15", "summary16", "summary17", "summary18", "summary19", "summary20", "summary21", "summary22", "summary23", "summary24", "summary25"];
         //    var len = SummaryArray.length;
@@ -109,16 +117,13 @@
         //    return SummaryMap;
         //}
         //Function for running tts and changing the summary text based on the bar being hovered
-        function textChange(id) {
-            //var myMap = setMaps();
-            //var text = myMap.get(id);
-            var text = "test";
+        function textChange(text) {
             document.getElementById("summaryText").innerText = text;
             speakText(text);
         }
 
         function getMetaData() {
-            var requestURL = "3001_1.json";
+            var requestURL = "2998_0.json";
             var request = new XMLHttpRequest();
             request.open('GET', requestURL);
             request.responseType = 'json';
@@ -196,26 +201,24 @@
                         "translate(" + margin.left + "," + margin.top + ")");
 
                 //Read the data
-                d3.csv("3001_1.csv").then(function (data) {
+                d3.csv("2998_0.csv").then(function (data) {
                     var x = d3.scaleBand()
                         .domain(data.map(function (d) { return d[getX(d)]; }))
                         .range([0, width]);
                     svg.append("g")
                         .attr("transform", "translate(0," + height + ")")
                         .call(d3.axisBottom(x));
-
                     // Add Y axis
                     var y = d3.scaleLinear()
                         .domain([0, d3.max(data, function (d) { return +d[getY(d)]; })])
                         .range([height, 0]);
                     svg.append("g")
                         .call(d3.axisLeft(y));
-
                     var tip = d3.tip()
                         .attr('class', 'd3-tip')
                         .offset([-10, 0])
                         .html(function (d) {
-                            return "<strong> " + getY(d) + ":</strong> <span style='color:red'>" + d[getY(d)] + "</span>";
+                            return "<strong> " + yAxis + ":</strong> <span style='color:red'>" + d[getY(d)] + "</span>";
                         })
                     svg.call(tip);
                     // Add the line
@@ -228,18 +231,20 @@
                             .x(function (d) { return x(d[getX(d)]) })
                             .y(function (d) { return y(d[getY(d)]) })
                         );
+
                     svg.selectAll(".dot")
                         .data(data)
                         .enter().append("circle")
                         .attr("class", "dot") // Assign a class for styling
-                        .attr("cx", function (d, i) { return x(d[getX(d)]) })
+                        .attr("xVal", function (d) { return d[getX(d)] })
+                        .attr("yVal", function (d) { return d[getY(d)] })
+                        .attr("cx", function (d) { return x(d[getX(d)]) })
                         .attr("cy", function (d) { return y(d[getY(d)]) })
                         .attr("r", 5)
                         .attr("fill", "grey")
                         .on('mouseover', tip.show)
                         .on('mouseout', tip.hide)
-                        .each(setId)
-                        .each(addHandler(data));
+                        .each(setId);
                 });
             }
 
@@ -259,7 +264,7 @@
                     .attr('class', 'd3-tip')
                     .offset([-10, 0])
                     .html(function (d) {
-                        return "<strong> " + getY(d) + ":</strong> <span style='color:red'>" + d[getY(d)] + "</span>";
+                        return "<strong> " + yAxis + ":</strong> <span style='color:red'>" + d[getY(d)] + "</span>";
                     })
 
                 var svg = d3.select("body").append("svg")
@@ -270,7 +275,7 @@
 
                 svg.call(tip);
 
-                d3.csv("3001_1.csv").then(function (data) {
+                d3.csv("2998_0.csv").then(function (data) {
                     x.domain(data.map(function (d) {
                         return d[getX(d)];
                     }));
@@ -292,23 +297,23 @@
                     svg.selectAll(".bar")
                         .data(data)
                         .enter().append("rect")
-                        .each(setId)
-                        .each(addHandler)
                         .attr("class", "bar")
+                        .attr("height", function (d) {
+                            return y(d[getY(d)]);
+                        })
                         .attr("x", function (d) {
                             return x(d[getX(d)]);
                         })
-                        .attr("width", x.bandwidth())
                         .attr("y", function (d) {
                             return y(d[getY(d)]);
                         })
-                        .attr("height", function (d) {
-                            return height - y(d[getY(d)]);
-                        })
+                        .attr("width", x.bandwidth())
+                        .attr("xVal", function (d) { return d[getX(d)] })
+                        .attr("yVal", function (d) { return d[getY(d)] })
                         .on('mouseover', tip.show)
                         .on('mouseout', tip.hide)
-                        .attr("fill", "#3093cf");
-
+                        .attr("fill", "#3093cf")
+                        .each(setId);
                 });
             }
         </script>
