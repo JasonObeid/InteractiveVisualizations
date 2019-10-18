@@ -64,8 +64,8 @@
     <script>
         var xAxis = "";
         var yAxis = "";
-        var jsonPath = "2756_0.json";
-        var csvPath = "2756_0.csv";
+        var jsonPath = "3001_0.json";
+        var csvPath = "3001_0.csv";
 
         function run(x, y, graphType) {
             xAxis = x.replace(/_/g, " ");
@@ -140,11 +140,11 @@
             }
         }
         function getX(d) {
-            xAxisName = d3.keys(d)[1];
+            xAxisName = d3.keys(d)[0];
             return xAxisName;
         }
         function getY(d) {
-            yAxisName = d3.keys(d)[0];
+            yAxisName = d3.keys(d)[1];
             return yAxisName;
         }
     </script>
@@ -252,72 +252,7 @@
             }
 
             function barGraph() {
-                var margin = { top: 40, right: 80, bottom: 30, left: 90 },
-                    width = 960 - margin.left - margin.right,
-                    height = 600 - margin.top - margin.bottom;
 
-                var x = d3.scaleBand()
-                    .rangeRound([0, width])
-                    .padding(0.1);
-
-                var y = d3.scaleLinear()
-                    .rangeRound([height, 0]);
-
-                var tip = d3.tip()
-                    .attr('class', 'd3-tip')
-                    .offset([-10, 0])
-                    .html(function (d) {
-                        return "<strong> " + yAxis + ":</strong> <span style='color:red'>" + d[getY(d)] + "</span>";
-                    })
-
-                var svg = d3.select("body").append("svg")
-                    .attr("width", width + margin.left + margin.right)
-                    .attr("height", height + margin.top + margin.bottom)
-                    .append("g")
-                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-                svg.call(tip);
-
-                d3.csv(csvPath).then(function (data) {
-                    x.domain(data.map(function (d) {
-                        return d[getX(d)];
-                    }));
-                    y.domain([0, d3.max(data, function (d) {
-                        return (d[getY(d)]);
-                    })]);
-                    svg.append("g")
-                        .attr("transform", "translate(0," + height + ")")
-                        .call(d3.axisBottom(x));
-
-                    svg.append("g")
-                        .call(d3.axisLeft(y))
-                        .append("text")
-                        .attr("transform", "rotate(-90)")
-                        .attr("y", 6)
-                        .attr("dy", ".71em")
-                        .style("text-anchor", "end");
-
-                    svg.selectAll(".bar")
-                        .data(data)
-                        .enter().append("rect")
-                        .attr("class", "bar")
-                        .attr("x", function (d) {
-                            return x(d[getX(d)]);
-                        })
-                        .attr("width", x.bandwidth())
-                        .attr("y", function (d) {
-                            return y(d[getY(d)]);
-                        })
-                        .attr("height", function (d) {
-                            return y(d[getY(d)]);
-                        })
-                        .attr("xVal", function (d) { return d[getX(d)] })
-                        .attr("yVal", function (d) { return d[getY(d)] })
-                        .on('mouseover', tip.show)
-                        .on('mouseout', tip.hide)
-                        .attr("fill", "#3093cf")
-                        .each(setId);
-                });
             }
         </script>
     </section>
