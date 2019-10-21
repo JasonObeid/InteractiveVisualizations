@@ -57,7 +57,6 @@
 <html>
 
 <head>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.2/css/all.css" />
 </head>
 
 <body>
@@ -97,29 +96,7 @@
             });
             count = count + 1;
         }
-        //adds hover event handler for each d3 bar element
-        //function addHandler(data) {
-        //    var id = d3.select(this).attr("id");
-        //    console.log(id);
-        //    console.log(data);
-        //
-        //}
-        //creates a map given an array of summaries. Values are currently hardcoded
-        //function setMaps() {
-        //    var SummaryArray = new Array;
-        //    var SummaryMap = new Map();
-        //
-        //    SummaryArray = ["summary0", "summary1", "summary2", "summary3", "summary4", "summary5", "summary6", "summary7", "summary8", "summary9", "summary10", "summary11",
-        //        "summary12", "summary13", "summary14", "summary15", "summary16", "summary17", "summary18", "summary19", "summary20", "summary21", "summary22", "summary23", "summary24", "summary25"];
-        //    var len = SummaryArray.length;
-        //    for (var i = 0; i < len; i++) {
-        //        elementId = idArray[i];
-        //        value = SummaryArray[i]
-        //        SummaryMap.set(elementId, value);
-        //    }
-        //    return SummaryMap;
-        //}
-        //Function for running tts and changing the summary text based on the bar being hovered
+        
         function textChange(text) {
             document.getElementById("summaryText").innerText = text;
             speakText(text);
@@ -266,3 +243,28 @@
 </body>
 
 </html>
+<script>
+    //adds hover event handler for each d3 bar element
+        //function addHandler(data) {
+        //    var id = d3.select(this).attr("id");
+        //    console.log(id);
+        //    console.log(data);
+        //
+        //}
+        //creates a map given an array of summaries. Values are currently hardcoded
+        //function setMaps() {
+        //    var SummaryArray = new Array;
+        //    var SummaryMap = new Map();
+        //
+        //    SummaryArray = ["summary0", "summary1", "summary2", "summary3", "summary4", "summary5", "summary6", "summary7", "summary8", "summary9", "summary10", "summary11",
+        //        "summary12", "summary13", "summary14", "summary15", "summary16", "summary17", "summary18", "summary19", "summary20", "summary21", "summary22", "summary23", "summary24", "summary25"];
+        //    var len = SummaryArray.length;
+        //    for (var i = 0; i < len; i++) {
+        //        elementId = idArray[i];
+        //        value = SummaryArray[i]
+        //        SummaryMap.set(elementId, value);
+        //    }
+        //    return SummaryMap;
+        //}
+        //Function for running tts and changing the summary text based on the bar being hovered
+</script>
