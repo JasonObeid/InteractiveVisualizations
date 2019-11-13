@@ -57,151 +57,178 @@
 <html>
 
 <head>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.2/css/all.css" />
 </head>
 
 <body>
     <script>
+        var xAxis = "";
+        var yAxis = "";
+        var jsonPath = "3001_0.json";
+        var csvPath = "3001_0.csv";
+        var summaryPath = "3001_0_Summary.json"
+
+        //var jsonPath = "7920_0.json";
+        //var summaryPath = "7920_0_Summary.json"
+        //var csvPath = "7920_0.csv";
+
+        function run(x, y, graphType) {
+            xAxis = x.replace(/_/g, " ");
+            yAxis = y.replace(/_/g, " ");
+            setTitle(xAxis, yAxis, graphType);
+            setSummary();
+            if (graphType == "line") {
+                lineGraph();
+            }
+            else if (graphType == "bar") {
+                barGraph();
+            }
+        }
+        function setSummary() {
+            var requestURL1 = summaryPath;
+            var request1 = new XMLHttpRequest();
+            request1.open('GET', requestURL1);
+            request1.responseType = 'json';
+            request1.send();
+            request1.onload = function () {
+                var jsonObj = request1.response;
+                summary = JSON.stringify(jsonObj);
+                sliced = summary.slice(13, summary.length - 3);
+                document.getElementById('summary').innerText = sliced;
+            }
+        }
+        function setTitle(x, y, graph) {
+            var title = graph + " graph of " + x + " at " + y;
+            document.getElementById('title').innerText = title;
+        }
         var count = 0;
-        var idArray = new Array;
-        //sets unique id for each d3 bar element
         function setId() {
             var id = ("Column" + count)
-            idArray.push(id);
             d3.select(this).attr("id", id);
+            xValue = d3.select(this).attr("xVal");
+            yValue = d3.select(this).attr("yVal");
+            var string = yAxis + " is " + yValue + " at " + xAxis + " " + xValue;
+            document.getElementById(id).addEventListener("mouseover", function () {
+                textChange(string);
+            });
             count = count + 1;
         }
-        //adds hover event handler for each d3 bar element
-        function addHandler() {
-            var id = d3.select(this).attr("id");
-            document.getElementById(id).addEventListener("mouseover", function () {
-                textChange(id);
-            });
-        }
-        //creates a map given an array of summaries. Keys are currently hardcoded
-        function setMaps() {
-            var SummaryArray = new Array;
-            var SummaryMap = new Map();
-            SummaryArray = ["summary0", "summary1", "summary2", "summary3", "summary4", "summary5", "summary6", "summary7", "summary8", "summary9", "summary10", "summary11",
-                "summary12", "summary13", "summary14", "summary15", "summary16", "summary17", "summary18", "summary19", "summary20", "summary21", "summary22", "summary23", "summary24", "summary25"];
-            var len = SummaryArray.length;
-            for (var i = 0; i < len; i++) {
-                elementId = idArray[i];
-                value = SummaryArray[i]
-                SummaryMap.set(elementId, value);
-            }
-            return SummaryMap;
-        }
-        //Function for running tts and changing the summary text based on the bar being hovered
-        function textChange(id) {
-            var myMap = setMaps();
-            var text = myMap.get(id);
+
+        function textChange(text) {
             document.getElementById("summaryText").innerText = text;
             speakText(text);
         }
-        function minMax(max) {
-            var yVal = d3.select(this).attr("y");
-            if (yVal == max) {
-                d3.select(this).attr("fill", "green");
-            }
-            else {
-                d3.select(this).attr("fill", "orange");
-            }
-        }
-        function getMetaData() {
-            var xmlhttp = new XMLHttpRequest();
-            xmlhttp.onreadystatechange = function () {
-                if (this.readyState == 4 && this.status == 200) {
-                    var myObj = JSON.parse(this.responseText);
-                    test = myObj['encoding']["y"]["field"];
-                    test1 = myObj['encoding']["x"]["field"];
-                    test2 = myObj['mark'];
-                    setAxes(test, test1, test2);
-                }
-            };
-            xmlhttp.open("GET", "2998_0.json", true);
-            xmlhttp.send();
-        }
-        function setX(x) {
-            return x;
-        }
-        function setY(y) {
-            return y;
-        }
-        function setMark(mark) {
-            return mark;
-        }
-    </script>
 
-    <!--Text to speech-->
-    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.529.0.min.js"></script>
-    <script type="text/javascript">
-        // Initialize the Amazon Cognito credentials provider
-        AWS.config.region = 'us-east-1';
-        AWS.config.credentials = new AWS.CognitoIdentityCredentials({ IdentityPoolId: 'us-east-1:1dbc5481-8414-4da8-9fd9-2ecd12443250' });
-        function speakText(text) {
-            // Create the JSON parameters for getSynthesizeSpeechUrl
-            var speechParams = {
-                OutputFormat: "mp3",
-                Engine: "neural",
-                SampleRate: "16000",
-                Text: text,
-                TextType: "text",
-                VoiceId: "Matthew"
-            };
-            // Create the Polly service object and presigner object
-            var polly = new AWS.Polly({ apiVersion: '2016-06-10' });
-            var signer = new AWS.Polly.Presigner(speechParams, polly)
-            // Create presigned URL of synthesized speech file
-            signer.getSynthesizeSpeechUrl(speechParams, function (error, url) {
-                if (error) {
-                    window.alert("AWS Polly error");
-                } else {
-                    document.getElementById('audioSource').src = url;
-                    document.getElementById('audioPlayback').load();
-                    document.getElementById('audioPlayback').play();
-                }
-            });
+        function getMetaData() {
+            var requestURL = jsonPath;
+            var request = new XMLHttpRequest();
+            request.open('GET', requestURL);
+            request.responseType = 'json';
+            request.send();
+            request.onload = function () {
+                var jsonObj = request.response;
+                yAxis = jsonObj['encoding']["y"]["field"];
+                xAxis = jsonObj['encoding']["x"]["field"];
+                graphType = jsonObj['mark'];
+                run(xAxis, yAxis, graphType);
+            }
+        }
+        function getX(d) {
+            xAxisName = d3.keys(d)[0];
+            return xAxisName;
+        }
+        function getY(d) {
+            yAxisName = d3.keys(d)[1];
+            return yAxisName;
         }
     </script>
 
     <section id="graph">
-        <h1 class="title">Frequency Distribution of Alphabet from file 'Data.tsv'</h1>
+
         <!--Bar graph with-->
-        <script src="http://d3js.org/d3.v3.min.js"></script>
-        <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+        <script src="d3-tip.js"></script>
         <script>
             getMetaData();
-            //console.log(xAxis);
-            function createGraph(fileName, type, xName, yName) {
+            function lineGraph() {
 
-                var margin = { top: 40, right: 20, bottom: 30, left: 40 },
+                var margin = { top: 10, right: 30, bottom: 30, left: 60 },
+                    width = 1000 - margin.left - margin.right,
+                    height = 600 - margin.top - margin.bottom;
+
+                // append the svg object to the body of the page
+                var svg = d3.select("body")
+                    .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform",
+                        "translate(" + margin.left + "," + margin.top + ")");
+
+                //Read the data
+                d3.csv(csvPath).then(function (data) {
+                    var x = d3.scaleBand()
+                        .domain(data.map(function (d) { return d[getX(d)]; }))
+                        .range([0, width]);
+                    svg.append("g")
+                        .attr("transform", "translate(0," + height + ")")
+                        .call(d3.axisBottom(x));
+                    // Add Y axis
+                    var y = d3.scaleLinear()
+                        .domain([0, d3.max(data, function (d) { return +d[getY(d)]; })])
+                        .range([height, 0]);
+                    svg.append("g")
+                        .call(d3.axisLeft(y));
+                    var tip = d3.tip()
+                        .attr('class', 'd3-tip')
+                        .offset([-10, 0])
+                        .html(function (d) {
+                            return "<strong> " + yAxis + ":</strong> <span style='color:red'>" + d[getY(d)] + "</span>";
+                        })
+                    svg.call(tip);
+                    // Add the line
+                    svg.append("path")
+                        .datum(data)
+                        .attr("fill", "none")
+                        .attr("stroke", "steelblue")
+                        .attr("stroke-width", 1.5)
+                        .attr("d", d3.line()
+                            .x(function (d) { return x(d[getX(d)]) })
+                            .y(function (d) { return y(d[getY(d)]) })
+                        );
+
+                    svg.selectAll(".dot")
+                        .data(data)
+                        .enter().append("circle")
+                        .attr("class", "dot") // Assign a class for styling
+                        .attr("xVal", function (d) { return d[getX(d)] })
+                        .attr("yVal", function (d) { return d[getY(d)] })
+                        .attr("cx", function (d) { return x(d[getX(d)]) })
+                        .attr("cy", function (d) { return y(d[getY(d)]) })
+                        .attr("r", 5)
+                        .attr("fill", "grey")
+                        .on('mouseover', tip.show)
+                        .on('mouseout', tip.hide)
+                        .each(setId);
+                });
+            }
+
+            function barGraph() {
+                var margin = { top: 40, right: 80, bottom: 30, left: 90 },
                     width = 960 - margin.left - margin.right,
-                    height = 500 - margin.top - margin.bottom;
+                    height = 600 - margin.top - margin.bottom;
 
-                if (type == "")
-                    var formatPercent = d3.format(".0%");
+                var x = d3.scaleBand()
+                    .rangeRound([0, width])
+                    .padding(0.1);
 
-                var x = d3.scale.ordinal()
-                    .rangeRoundBands([0, width], .1);
-
-                var y = d3.scale.linear()
-                    .range([height, 0]);
-
-                var xAxis = d3.svg.axis()
-                    .scale(x)
-                    .orient("bottom");
-
-                var yAxis = d3.svg.axis()
-                    .scale(y)
-                    .orient("left")
-                    .tickFormat(formatPercent);
+                var y = d3.scaleLinear()
+                    .rangeRound([height, 0]);
 
                 var tip = d3.tip()
                     .attr('class', 'd3-tip')
                     .offset([-10, 0])
                     .html(function (d) {
-                        return "<strong>" + yName + ":</strong> <span style='color:red'>" + d.revenue + "</span>";
+                        return "<strong> " + getY(d) + ":</strong> <span style='color:red'>" + d[getY(d)] + "</span>";
                     })
 
                 var svg = d3.select("body").append("svg")
@@ -212,54 +239,119 @@
 
                 svg.call(tip);
 
-                d3.csv(fileName, type, function (error, data) {
-                    x.domain(data.map(function (d) { return d.year; }));
-                    y.domain([0, d3.max(data, function (d) { return d.revenue; })]);
-                    console.log(data);
+                d3.csv(csvPath).then(function (data) {
+                    x.domain(data.map(function (d) {
+                        return d[getX(d)];
+                    }));
+                    y.domain([0, d3.max(data, function (d) {
+                        return d3.format(".1e")(d[getY(d)]);
+                    })]);
                     svg.append("g")
-                        .attr("class", "x axis")
                         .attr("transform", "translate(0," + height + ")")
-                        .call(xAxis)
+                        .call(d3.axisBottom(x));
 
                     svg.append("g")
-                        .attr("class", "y axis")
-                        .call(yAxis)
+                        .call(d3.axisLeft(y))
                         .append("text")
                         .attr("transform", "rotate(-90)")
                         .attr("y", 6)
                         .attr("dy", ".71em")
-                        .style("text-anchor", "end")
-                        .text(yName);
+                        .style("text-anchor", "end");
 
                     svg.selectAll(".bar")
                         .data(data)
                         .enter().append("rect")
-                        .each(setId)
-                        .each(addHandler)
                         .attr("class", "bar")
-                        .attr("x", function (d) { return x(d.year); })
-                        .attr("width", x.rangeBand())
-                        .attr("y", function (d) { return y(d.revenue); })
-                        .attr("height", function (d) { return height - y(d.revenue); })
+                        .attr("x", function (d) {
+                            return x(d[getX(d)]);
+                        })
+                        .attr("width", x.bandwidth())
+                        .attr("y", function (d) {
+                            return y(d[getY(d)]);
+                        })
+                        .attr("height", function (d) {
+                            return height - y(d[getY(d)]);
+                        })
+                        .attr("xVal", function (d) { return d[getX(d)] })
+                        .attr("yVal", function (d) { return d[getY(d)] })
                         .on('mouseover', tip.show)
                         .on('mouseout', tip.hide)
-                        .attr("fill", "#3093cf");
+                        .attr("fill", "#3093cf")
+                        .each(setId);
 
                 });
-                function type(d) {
-                    d.revenue = +d.revenue;
-                    return d;
-                }
             }
-            createGraph("3001_0.csv", "line", "year", "revenue");
+        </script>
+
+        <!--Text to speech-->
+        <script src="https://sdk.amazonaws.com/js/aws-sdk-2.529.0.min.js"></script>
+        <script type="text/javascript">
+            // Initialize the Amazon Cognito credentials provider
+            AWS.config.region = 'us-east-1';
+            AWS.config.credentials = new AWS.CognitoIdentityCredentials({ IdentityPoolId: 'us-east-1:1dbc5481-8414-4da8-9fd9-2ecd12443250' });
+            function speakText(text) {
+                // Create the JSON parameters for getSynthesizeSpeechUrl
+                var speechParams = {
+                    OutputFormat: "mp3",
+                    Engine: "neural",
+                    SampleRate: "16000",
+                    Text: text,
+                    TextType: "text",
+                    VoiceId: "Matthew"
+                };
+                // Create the Polly service object and presigner object
+                var polly = new AWS.Polly({ apiVersion: '2016-06-10' });
+                var signer = new AWS.Polly.Presigner(speechParams, polly)
+                // Create presigned URL of synthesized speech file
+                signer.getSynthesizeSpeechUrl(speechParams, function (error, url) {
+                    if (error) {
+                        window.alert("AWS Polly error");
+                    } else {
+                        document.getElementById('audioSource').src = url;
+                        document.getElementById('audioPlayback').load();
+                        document.getElementById('audioPlayback').play();
+                    }
+                });
+            }
         </script>
     </section>
-    <h1 id="summaryText">Hover over a bar to hear its caption</h1>
-
-    <audio id="audioPlayback" controls>
-        <source id="audioSource" type="audio/mp3" src="">
-    </audio>
-
+    <table>
+        <tr>
+            <td><h1 id="title"></h1></td>
+            <td><h1 id="summaryText">Hover over a bar to hear its caption</h1></td>
+            <td><p id="summary">hi</p></td>
+        </tr>
+        <tr>
+            <audio id="audioPlayback" controls>
+                <source id="audioSource" type="audio/mp3" src="">
+            </audio>
+        </tr>
+    </table>
 </body>
 
 </html>
+<script>
+                                //adds hover event handler for each d3 bar element
+                                    //function addHandler(data) {
+                                    //    var id = d3.select(this).attr("id");
+                                    //    console.log(id);
+                                    //    console.log(data);
+                                    //
+                                    //}
+                                    //creates a map given an array of summaries. Values are currently hardcoded
+                                    //function setMaps() {
+                                    //    var SummaryArray = new Array;
+                                    //    var SummaryMap = new Map();
+                                    //
+                                    //    SummaryArray = ["summary0", "summary1", "summary2", "summary3", "summary4", "summary5", "summary6", "summary7", "summary8", "summary9", "summary10", "summary11",
+                                    //        "summary12", "summary13", "summary14", "summary15", "summary16", "summary17", "summary18", "summary19", "summary20", "summary21", "summary22", "summary23", "summary24", "summary25"];
+                                    //    var len = SummaryArray.length;
+                                    //    for (var i = 0; i < len; i++) {
+                                    //        elementId = idArray[i];
+                                    //        value = SummaryArray[i]
+                                    //        SummaryMap.set(elementId, value);
+                                    //    }
+                                    //    return SummaryMap;
+                                    //}
+                                    //Function for running tts and changing the summary text based on the bar being hovered
+</script>

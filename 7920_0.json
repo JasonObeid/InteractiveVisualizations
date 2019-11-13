@@ -9,11 +9,11 @@
         "range": ["#393d77","#bc9d42","#043c30","#ab4a4c","#64783c", "#7a4372", "#532f0b", "#d4626d", "#e6b95b", "#6c71cc", "#b5cd71"]
       }
     }, 
-    "x": {
+    "y": {
       "field": "percent", 
       "type": "quantitative"
     }, 
-    "y": {
+    "x": {
       "field": "major", 
       "type": "nominal",
       "sort": null
