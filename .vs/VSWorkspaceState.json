@@ -4,9 +4,8 @@
     "\\data",
     "\\data\\d3",
     "\\data\\d3\\data",
-    "\\data\\d3\\specs",
-    "\\data\\vega-lite-example-gallery"
+    "\\data\\d3\\specs"
   ],
-  "SelectedNode": "\\3001_1_summary.json",
+  "SelectedNode": "\\3001_1.csv",
   "PreviewInSolutionExplorer": false
 }

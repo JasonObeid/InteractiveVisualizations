@@ -75,51 +75,41 @@
         //var summaryPath = "7920_0_Summary.json"
         //var csvPath = "7920_0.csv";
 
-        function run(x, y, graphType) {
-
+        function run(summaryArray, trendsArray) {
             xAxis = x.replace(/_/g, " ");
             yAxis = y.replace(/_/g, " ");
-            setTitle(xAxis, yAxis, graphType);
             if (graphType == "line") {
                 lineGraph();
+                setSummary(summaryArray);
+                setGraphs(trendsArray);
             }
             else if (graphType == "bar") {
                 barGraph();
+                setSummary(summaryArray);
             }
-            var x = d3.selectAll("p").enter("p").attr("id");
-            console.log(x);
         }
-        function setSummary() {
-            var requestURL1 = summaryPath;
-            var request1 = new XMLHttpRequest();
-            request1.open('GET', requestURL1);
-            request1.responseType = 'json';
-            request1.send();
-            request1.onload = function () {
-                var jsonObj = request1.response;
-                var summaryArray = jsonObj.summmary;
-                var trendsArray = jsonObj.trends;
-                for (i = 0; i < summaryArray.length; i++) {
-                    console.log(summaryArray[i]);
-                    var anchor = document.createElement("A");
-                    id = "A" + i
-                    anchor.setAttribute("id", id);
-                    anchor.innerHTML = summaryArray[i];
-                    document.getElementById('summary').appendChild(anchor);
-                    if (i > 0) {
-                        addTextListener(id);
-                    }
-                }
-                for (n = 0; n < trendsArray.length; n++) {
-                    start = trendsArray[n].start;
-                    end = trendsArray[n].end;
-                    for (m = start; m <= end; m++) {
-                        addGraphListener(m);
-                    }
+
+        function setSummary(summaryArray) {
+            for (i = 0; i < summaryArray.length; i++) {
+                console.log(summaryArray[i]);
+                var anchor = document.createElement("A");
+                id = "A" + i
+                anchor.setAttribute("id", id);
+                anchor.innerHTML = summaryArray[i];
+                document.getElementById('summary').appendChild(anchor);
+                if (i > 0) {
+                    addTextListener(id);
                 }
             }
         }
-        function addGraphListener(m) {
+        function setGraphs() {
+            for (n = 0; n < trendsArray.length; n++) {
+                start = trendsArray[n].start;
+                end = trendsArray[n].end;
+                for (m = start; m <= end; m++) {
+                    addGraphListener(m);
+                }
+            }
             //var d3Id = "circle#Column" + m + ".dot";
 
             //var circle = svg.selectAll(d3Id).data(data) // UPDATE
@@ -178,9 +168,21 @@
                 yAxis = jsonObj['encoding']["y"]["field"];
                 xAxis = jsonObj['encoding']["x"]["field"];
                 graphType = jsonObj['mark'];
-                run(xAxis, yAxis, graphType);
+                setTitle(xAxis, yAxis, graphType);
+            }
+            var requestURL1 = summaryPath;
+            var request1 = new XMLHttpRequest();
+            request1.open('GET', requestURL1);
+            request1.responseType = 'json';
+            request1.send();
+            request1.onload = function () {
+                var jsonObj = request1.response;
+                var summaryArray = jsonObj.summmary;
+                var trendsArray = jsonObj.trends;
+                run(summaryArray, trendsArray);
             }
         }
+
         function getX(d) {
             xAxisName = d3.keys(d)[0];
             return xAxisName;
@@ -256,9 +258,16 @@
                         .attr("cy", function (d) { return y(d[getY(d)]) })
                         .attr("r", 5)
                         .attr("fill", "grey")
-                        .on('mouseover', tip.show)
-                        .on('mouseout', tip.hide)
-                        .each(setId);
+                        .each(setId)
+                        .on('mouseover', function (d) {
+                            tip.show;
+                            addOverListener();
+                        })
+                        .on('mouseout', function (d) {
+                            tip.hide;
+                            addOutListener();
+                        });
+
                 });
                 setSummary();
             }
