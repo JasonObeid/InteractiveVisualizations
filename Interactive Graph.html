@@ -52,6 +52,10 @@
             top: 100%;
             left: 0;
         }
+
+    p:focus {
+        background-color: #f00;
+    }
 </style>
 
 <html>
@@ -60,7 +64,6 @@
 </head>
 
 <body>
-    <script src="https://d3js.org/d3.v5.min.js"></script>
     <script>
         var xAxis = "";
         var yAxis = "";
@@ -72,66 +75,64 @@
         //var summaryPath = "7920_0_Summary.json"
         //var csvPath = "7920_0.csv";
 
-        function run(x, y, graphType) {
+        function run(summaryArray, trendsArray) {
             xAxis = x.replace(/_/g, " ");
             yAxis = y.replace(/_/g, " ");
-            setTitle(xAxis, yAxis, graphType);
-            setSummary();
             if (graphType == "line") {
                 lineGraph();
+                setSummary(summaryArray);
+                setGraphs(trendsArray);
             }
             else if (graphType == "bar") {
                 barGraph();
-            }
-        }
-        function setSummary() {
-            var requestURL1 = summaryPath;
-            var request1 = new XMLHttpRequest();
-            request1.open('GET', requestURL1);
-            request1.responseType = 'json';
-            request1.send();
-            request1.onload = function () {
-                var jsonObj = request1.response;
-                var summaryArray = jsonObj.summmary;
-                var trendsArray = jsonObj.trends;
-                for (i = 0; i < summaryArray.length; i++) {
-                    console.log(summaryArray[i]);
-                    var anchor = document.createElement("A");
-                    id = "A" + i
-                    anchor.setAttribute("id", id);
-                    anchor.innerHTML = summaryArray[i];
-                    document.getElementById('summary').appendChild(anchor);
-                    //addSummaryListener(id, 1, 5);
-                }
-                for (n = 0; n < trendsArray.length; n++) {
-                    id2 = "A" + (n + 1)
-                    start = trendsArray[n].start;
-                    end = trendsArray[n].end;
-                    addSummaryListener(id2, start, end);
-                }
+                setSummary(summaryArray);
             }
         }
 
-        function addSummaryListener(id, startX, endX) {
+        function setSummary(summaryArray) {
+            for (i = 0; i < summaryArray.length; i++) {
+                console.log(summaryArray[i]);
+                var anchor = document.createElement("A");
+                id = "A" + i
+                anchor.setAttribute("id", id);
+                anchor.innerHTML = summaryArray[i];
+                document.getElementById('summary').appendChild(anchor);
+                if (i > 0) {
+                    addTextListener(id);
+                }
+            }
+        }
+        function setGraphs() {
+            for (n = 0; n < trendsArray.length; n++) {
+                start = trendsArray[n].start;
+                end = trendsArray[n].end;
+                for (m = start; m <= end; m++) {
+                    addGraphListener(m);
+                }
+            }
+            //var d3Id = "circle#Column" + m + ".dot";
+
+            //var circle = svg.selectAll(d3Id).data(data) // UPDATE
+            //    .style("fill", "blue");
+
+            //copy path
+            //var res = str.split(",");
+            //var h = document.getElementById("myH2");
+            //h.insertAdjacentHTML("afterend", "<path>My new paragraph</path>");
+
+            //document.getElementById(d3Id).addEventListener("mouseover", function () {
+            //    d3.select(d3Id).attr("fill", "red")
+            //});
+        }
+
+        function addTextListener(id) {
             //add listener for summary anchor
             document.getElementById(id).addEventListener("mouseover", function () {
-                document.getElementById(id).style.color = 'red';
+                document.getElementById(id).style.backgroundColor = 'cyan';
             });
-            //add listener for d3js line
-            // MOVE SCRIPT DOWN BECAUSE DOM ISNT FINDING THIS
-            console.log(d3.selectAll("#path1").attr("d"));
-            for (i = startX; i < endX; i++) {
-                //var d3Id = "Column" + i;
-
-                //copy path
-                //var res = str.split(",");
-                //var h = document.getElementById("myH2");
-                //h.insertAdjacentHTML("afterend", "<p>My new paragraph</p>");
-                d3.select("#Column1").attr("fill", "red");
-                //document.getElementById(d3Id).addEventListener("mouseover", function () {
-                //    d3.select(d3Id).attr("fill", "red")
-                //});
-            }
+            document.getElementById(id).addEventListener("mouseout", function () {
+                document.getElementById(id).style.backgroundColor = 'transparent';
+            });
         }
 
         function setTitle(x, y, graph) {
@@ -167,9 +168,21 @@
                 yAxis = jsonObj['encoding']["y"]["field"];
                 xAxis = jsonObj['encoding']["x"]["field"];
                 graphType = jsonObj['mark'];
-                run(xAxis, yAxis, graphType);
+                setTitle(xAxis, yAxis, graphType);
+            }
+            var requestURL1 = summaryPath;
+            var request1 = new XMLHttpRequest();
+            request1.open('GET', requestURL1);
+            request1.responseType = 'json';
+            request1.send();
+            request1.onload = function () {
+                var jsonObj = request1.response;
+                var summaryArray = jsonObj.summmary;
+                var trendsArray = jsonObj.trends;
+                run(summaryArray, trendsArray);
             }
         }
+
         function getX(d) {
             xAxisName = d3.keys(d)[0];
             return xAxisName;
@@ -194,7 +207,7 @@
                     height = 600 - margin.top - margin.bottom;
 
                 // append the svg object to the body of the page
-                var svg = d3.select("body")
+                var svg = d3.select("#chart")
                     .append("svg")
                     .attr("width", width + margin.left + margin.right)
                     .attr("height", height + margin.top + margin.bottom)
@@ -245,10 +258,18 @@
                         .attr("cy", function (d) { return y(d[getY(d)]) })
                         .attr("r", 5)
                         .attr("fill", "grey")
-                        .on('mouseover', tip.show)
-                        .on('mouseout', tip.hide)
-                        .each(setId);
+                        .each(setId)
+                        .on('mouseover', function (d) {
+                            tip.show;
+                            addOverListener();
+                        })
+                        .on('mouseout', function (d) {
+                            tip.hide;
+                            addOutListener();
+                        });
+
                 });
+                setSummary();
             }
 
             function barGraph() {
@@ -270,7 +291,7 @@
                         return "<strong> " + getY(d) + ":</strong> <span style='color:red'>" + d[getY(d)] + "</span>";
                     })
 
-                var svg = d3.select("body").append("svg")
+                var svg = d3.select("#chart").append("svg")
                     .attr("width", width + margin.left + margin.right)
                     .attr("height", height + margin.top + margin.bottom)
                     .append("g")
@@ -319,6 +340,8 @@
                         .each(setId);
 
                 });
+                x = document.getElementById("#Column1");
+                console.log(x);
             }
         </script>
 
@@ -359,9 +382,13 @@
     </audio>
     <table>
         <tr>
-            <td><h1 id="title"></h1></td>
-            <td><h1 id="summaryText">Hover over a bar to hear its caption</h1></td>
-            <td><p id="summary"></p></td>
+            <td colspan="2"><h1 id="title"></h1></td>
+        </tr>
+        <tr>
+            <td><h4 id="summaryText" width="50%">Hover over a bar to hear its caption</h4></td>
+            <td><h4 id="summary" width="50%"></h4></td>
+        </tr>
+        <tr id="chart" colspan="2">
         </tr>
     </table>
 </body>
