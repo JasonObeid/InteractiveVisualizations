@@ -60,12 +60,13 @@
 </head>
 
 <body>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
     <script>
         var xAxis = "";
         var yAxis = "";
-        var jsonPath = "3001_0.json";
-        var csvPath = "3001_0.csv";
-        var summaryPath = "3001_0_Summary.json"
+        var jsonPath = "3001_1.json";
+        var csvPath = "3001_1.csv";
+        var summaryPath = "3001_1_summary.json"
 
         //var jsonPath = "7920_0.json";
         //var summaryPath = "7920_0_Summary.json"
@@ -91,11 +92,47 @@
             request1.send();
             request1.onload = function () {
                 var jsonObj = request1.response;
-                summary = JSON.stringify(jsonObj);
-                sliced = summary.slice(13, summary.length - 3);
-                document.getElementById('summary').innerText = sliced;
+                var summaryArray = jsonObj.summmary;
+                var trendsArray = jsonObj.trends;
+                for (i = 0; i < summaryArray.length; i++) {
+                    console.log(summaryArray[i]);
+                    var anchor = document.createElement("A");
+                    id = "A" + i
+                    anchor.setAttribute("id", id);
+                    anchor.innerHTML = summaryArray[i];
+                    document.getElementById('summary').appendChild(anchor);
+                    //addSummaryListener(id, 1, 5);
+                }
+                for (n = 0; n < trendsArray.length; n++) {
+                    id2 = "A" + (n + 1)
+                    start = trendsArray[n].start;
+                    end = trendsArray[n].end;
+                    addSummaryListener(id2, start, end);
+                }
             }
         }
+
+        function addSummaryListener(id, startX, endX) {
+            //add listener for summary anchor
+            document.getElementById(id).addEventListener("mouseover", function () {
+                document.getElementById(id).style.color = 'red';
+            });
+            //add listener for d3js line
+            console.log(d3.selectAll("#path1").attr("d"));
+            for (i = startX; i < endX; i++) {
+                //var d3Id = "Column" + i;
+
+                //copy path
+                //var res = str.split(",");
+                //var h = document.getElementById("myH2");
+                //h.insertAdjacentHTML("afterend", "<p>My new paragraph</p>");
+                d3.select("#Column1").attr("fill", "red");
+                //document.getElementById(d3Id).addEventListener("mouseover", function () {
+                //    d3.select(d3Id).attr("fill", "red")
+                //});
+            }
+        }
+
         function setTitle(x, y, graph) {
             var title = graph + " graph of " + x + " at " + y;
             document.getElementById('title').innerText = title;
@@ -188,6 +225,7 @@
                     // Add the line
                     svg.append("path")
                         .datum(data)
+                        .attr("id", "path1")
                         .attr("fill", "none")
                         .attr("stroke", "steelblue")
                         .attr("stroke-width", 1.5)
@@ -315,43 +353,41 @@
             }
         </script>
     </section>
+    <audio id="audioPlayback" controls>
+        <source id="audioSource" type="audio/mp3" src="">
+    </audio>
     <table>
         <tr>
             <td><h1 id="title"></h1></td>
             <td><h1 id="summaryText">Hover over a bar to hear its caption</h1></td>
-            <td><p id="summary">hi</p></td>
-        </tr>
-        <tr>
-            <audio id="audioPlayback" controls>
-                <source id="audioSource" type="audio/mp3" src="">
-            </audio>
+            <td><p id="summary"></p></td>
         </tr>
     </table>
 </body>
 
 </html>
 <script>
-                                //adds hover event handler for each d3 bar element
-                                    //function addHandler(data) {
-                                    //    var id = d3.select(this).attr("id");
-                                    //    console.log(id);
-                                    //    console.log(data);
-                                    //
-                                    //}
-                                    //creates a map given an array of summaries. Values are currently hardcoded
-                                    //function setMaps() {
-                                    //    var SummaryArray = new Array;
-                                    //    var SummaryMap = new Map();
-                                    //
-                                    //    SummaryArray = ["summary0", "summary1", "summary2", "summary3", "summary4", "summary5", "summary6", "summary7", "summary8", "summary9", "summary10", "summary11",
-                                    //        "summary12", "summary13", "summary14", "summary15", "summary16", "summary17", "summary18", "summary19", "summary20", "summary21", "summary22", "summary23", "summary24", "summary25"];
-                                    //    var len = SummaryArray.length;
-                                    //    for (var i = 0; i < len; i++) {
-                                    //        elementId = idArray[i];
-                                    //        value = SummaryArray[i]
-                                    //        SummaryMap.set(elementId, value);
-                                    //    }
-                                    //    return SummaryMap;
-                                    //}
-                                    //Function for running tts and changing the summary text based on the bar being hovered
+                                                //adds hover event handler for each d3 bar element
+                                                    //function addHandler(data) {
+                                                    //    var id = d3.select(this).attr("id");
+                                                    //    console.log(id);
+                                                    //    console.log(data);
+                                                    //
+                                                    //}
+                                                    //creates a map given an array of summaries. Values are currently hardcoded
+                                                    //function setMaps() {
+                                                    //    var SummaryArray = new Array;
+                                                    //    var SummaryMap = new Map();
+                                                    //
+                                                    //    SummaryArray = ["summary0", "summary1", "summary2", "summary3", "summary4", "summary5", "summary6", "summary7", "summary8", "summary9", "summary10", "summary11",
+                                                    //        "summary12", "summary13", "summary14", "summary15", "summary16", "summary17", "summary18", "summary19", "summary20", "summary21", "summary22", "summary23", "summary24", "summary25"];
+                                                    //    var len = SummaryArray.length;
+                                                    //    for (var i = 0; i < len; i++) {
+                                                    //        elementId = idArray[i];
+                                                    //        value = SummaryArray[i]
+                                                    //        SummaryMap.set(elementId, value);
+                                                    //    }
+                                                    //    return SummaryMap;
+                                                    //}
+                                                    //Function for running tts and changing the summary text based on the bar being hovered
 </script>
