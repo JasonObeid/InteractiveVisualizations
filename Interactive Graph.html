@@ -52,6 +52,10 @@
             top: 100%;
             left: 0;
         }
+
+    p:focus {
+        background-color: #f00;
+    }
 </style>
 
 <html>
@@ -60,7 +64,6 @@
 </head>
 
 <body>
-    <script src="https://d3js.org/d3.v5.min.js"></script>
     <script>
         var xAxis = "";
         var yAxis = "";
@@ -73,16 +76,18 @@
         //var csvPath = "7920_0.csv";
 
         function run(x, y, graphType) {
+
             xAxis = x.replace(/_/g, " ");
             yAxis = y.replace(/_/g, " ");
             setTitle(xAxis, yAxis, graphType);
-            setSummary();
             if (graphType == "line") {
                 lineGraph();
             }
             else if (graphType == "bar") {
                 barGraph();
             }
+            var x = d3.selectAll("p").enter("p").attr("id");
+            console.log(x);
         }
         function setSummary() {
             var requestURL1 = summaryPath;
@@ -101,36 +106,43 @@
                     anchor.setAttribute("id", id);
                     anchor.innerHTML = summaryArray[i];
                     document.getElementById('summary').appendChild(anchor);
-                    //addSummaryListener(id, 1, 5);
+                    if (i > 0) {
+                        addTextListener(id);
+                    }
                 }
                 for (n = 0; n < trendsArray.length; n++) {
-                    id2 = "A" + (n + 1)
                     start = trendsArray[n].start;
                     end = trendsArray[n].end;
-                    addSummaryListener(id2, start, end);
+                    for (m = start; m <= end; m++) {
+                        addGraphListener(m);
+                    }
                 }
             }
         }
+        function addGraphListener(m) {
+            //var d3Id = "circle#Column" + m + ".dot";
 
-        function addSummaryListener(id, startX, endX) {
+            //var circle = svg.selectAll(d3Id).data(data) // UPDATE
+            //    .style("fill", "blue");
+
+            //copy path
+            //var res = str.split(",");
+            //var h = document.getElementById("myH2");
+            //h.insertAdjacentHTML("afterend", "<path>My new paragraph</path>");
+
+            //document.getElementById(d3Id).addEventListener("mouseover", function () {
+            //    d3.select(d3Id).attr("fill", "red")
+            //});
+        }
+
+        function addTextListener(id) {
             //add listener for summary anchor
             document.getElementById(id).addEventListener("mouseover", function () {
-                document.getElementById(id).style.color = 'red';
+                document.getElementById(id).style.backgroundColor = 'cyan';
             });
-            //add listener for d3js line
-            console.log(d3.selectAll("#path1").attr("d"));
-            for (i = startX; i < endX; i++) {
-                //var d3Id = "Column" + i;
-
-                //copy path
-                //var res = str.split(",");
-                //var h = document.getElementById("myH2");
-                //h.insertAdjacentHTML("afterend", "<p>My new paragraph</p>");
-                d3.select("#Column1").attr("fill", "red");
-                //document.getElementById(d3Id).addEventListener("mouseover", function () {
-                //    d3.select(d3Id).attr("fill", "red")
-                //});
-            }
+            document.getElementById(id).addEventListener("mouseout", function () {
+                document.getElementById(id).style.backgroundColor = 'transparent';
+            });
         }
 
         function setTitle(x, y, graph) {
@@ -193,7 +205,7 @@
                     height = 600 - margin.top - margin.bottom;
 
                 // append the svg object to the body of the page
-                var svg = d3.select("body")
+                var svg = d3.select("#chart")
                     .append("svg")
                     .attr("width", width + margin.left + margin.right)
                     .attr("height", height + margin.top + margin.bottom)
@@ -248,6 +260,7 @@
                         .on('mouseout', tip.hide)
                         .each(setId);
                 });
+                setSummary();
             }
 
             function barGraph() {
@@ -269,7 +282,7 @@
                         return "<strong> " + getY(d) + ":</strong> <span style='color:red'>" + d[getY(d)] + "</span>";
                     })
 
-                var svg = d3.select("body").append("svg")
+                var svg = d3.select("#chart").append("svg")
                     .attr("width", width + margin.left + margin.right)
                     .attr("height", height + margin.top + margin.bottom)
                     .append("g")
@@ -318,6 +331,8 @@
                         .each(setId);
 
                 });
+                x = document.getElementById("#Column1");
+                console.log(x);
             }
         </script>
 
@@ -358,9 +373,13 @@
     </audio>
     <table>
         <tr>
-            <td><h1 id="title"></h1></td>
-            <td><h1 id="summaryText">Hover over a bar to hear its caption</h1></td>
-            <td><p id="summary"></p></td>
+            <td colspan="2"><h1 id="title"></h1></td>
+        </tr>
+        <tr>
+            <td><h4 id="summaryText" width="50%">Hover over a bar to hear its caption</h4></td>
+            <td><h4 id="summary" width="50%"></h4></td>
+        </tr>
+        <tr id="chart" colspan="2">
         </tr>
     </table>
 </body>
