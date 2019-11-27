@@ -4,9 +4,7 @@
     "\\data",
     "\\data\\d3",
     "\\data\\d3\\data",
-    "\\data\\d3\\specs",
-    "\\data\\vega-lite-example-gallery"
+    "\\data\\d3\\specs"
   ],
-  "SelectedNode": "\\Interactive Graph.html",
   "PreviewInSolutionExplorer": false
 }
