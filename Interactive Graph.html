@@ -76,19 +76,16 @@
         //var csvPath = "7920_0.csv";
 
         function run(summaryArray, trendsArray) {
-            xAxis = x.replace(/_/g, " ");
-            yAxis = y.replace(/_/g, " ");
             if (graphType == "line") {
-                lineGraph();
                 setSummary(summaryArray);
-                setGraphs(trendsArray);
+                lineGraph(trendsArray);
+                //setGraphs(trendsArray);
             }
             else if (graphType == "bar") {
                 barGraph();
                 setSummary(summaryArray);
             }
         }
-
         function setSummary(summaryArray) {
             for (i = 0; i < summaryArray.length; i++) {
                 console.log(summaryArray[i]);
@@ -102,14 +99,21 @@
                 }
             }
         }
-        function setGraphs() {
+        function setGraphs(trendsArray) {
+            var columnArray = []
             for (n = 0; n < trendsArray.length; n++) {
                 start = trendsArray[n].start;
                 end = trendsArray[n].end;
                 for (m = start; m <= end; m++) {
-                    addGraphListener(m);
+                    var col = "Column" + m
+                    columnArray.push(col);
                 }
             }
+            return columnArray;
+        }
+        function addOverListener(colArray) {
+            test = d3.select(this);
+            console.log(test);
             //var d3Id = "circle#Column" + m + ".dot";
 
             //var circle = svg.selectAll(d3Id).data(data) // UPDATE
@@ -124,6 +128,11 @@
             //    d3.select(d3Id).attr("fill", "red")
             //});
         }
+        function addOutListener(colArray) {
+            test = this;
+            console.log(test);
+        }
+
 
         function addTextListener(id) {
             //add listener for summary anchor
@@ -136,7 +145,9 @@
         }
 
         function setTitle(x, y, graph) {
-            var title = graph + " graph of " + x + " at " + y;
+            xAxis = x.replace(/_/g, " ");
+            yAxis = y.replace(/_/g, " ");
+            var title = graph + " graph of " + xAxis + " at " + yAxis;
             document.getElementById('title').innerText = title;
         }
         var count = 0;
@@ -200,8 +211,9 @@
         <script src="d3-tip.js"></script>
         <script>
             getMetaData();
-            function lineGraph() {
-
+            function lineGraph(trendsArray) {
+                var colArray = setGraphs(trendsArray);
+                console.log(colArray);
                 var margin = { top: 10, right: 30, bottom: 30, left: 60 },
                     width = 1000 - margin.left - margin.right,
                     height = 600 - margin.top - margin.bottom;
@@ -247,7 +259,7 @@
                             .x(function (d) { return x(d[getX(d)]) })
                             .y(function (d) { return y(d[getY(d)]) })
                         );
-
+                    console.log(colArray);
                     svg.selectAll(".dot")
                         .data(data)
                         .enter().append("circle")
@@ -259,17 +271,11 @@
                         .attr("r", 5)
                         .attr("fill", "grey")
                         .each(setId)
-                        .on('mouseover', function (d) {
-                            tip.show;
-                            addOverListener();
-                        })
-                        .on('mouseout', function (d) {
-                            tip.hide;
-                            addOutListener();
-                        });
-
+                        .each(addOverListener(colArray))
+                        .each(addOutListener(colArray))
+                        .on('mouseover', tip.show)
+                        .on('mouseout', tip.hide);
                 });
-                setSummary();
             }
 
             function barGraph() {
@@ -388,34 +394,33 @@
             <td><h4 id="summaryText" width="50%">Hover over a bar to hear its caption</h4></td>
             <td><h4 id="summary" width="50%"></h4></td>
         </tr>
-        <tr id="chart" colspan="2">
-        </tr>
+        <tr id="chart" colspan="2"></tr>
     </table>
 </body>
 
 </html>
 <script>
-                                                //adds hover event handler for each d3 bar element
-                                                    //function addHandler(data) {
-                                                    //    var id = d3.select(this).attr("id");
-                                                    //    console.log(id);
-                                                    //    console.log(data);
-                                                    //
-                                                    //}
-                                                    //creates a map given an array of summaries. Values are currently hardcoded
-                                                    //function setMaps() {
-                                                    //    var SummaryArray = new Array;
-                                                    //    var SummaryMap = new Map();
-                                                    //
-                                                    //    SummaryArray = ["summary0", "summary1", "summary2", "summary3", "summary4", "summary5", "summary6", "summary7", "summary8", "summary9", "summary10", "summary11",
-                                                    //        "summary12", "summary13", "summary14", "summary15", "summary16", "summary17", "summary18", "summary19", "summary20", "summary21", "summary22", "summary23", "summary24", "summary25"];
-                                                    //    var len = SummaryArray.length;
-                                                    //    for (var i = 0; i < len; i++) {
-                                                    //        elementId = idArray[i];
-                                                    //        value = SummaryArray[i]
-                                                    //        SummaryMap.set(elementId, value);
-                                                    //    }
-                                                    //    return SummaryMap;
-                                                    //}
-                                                    //Function for running tts and changing the summary text based on the bar being hovered
+                                                        //adds hover event handler for each d3 bar element
+                                                            //function addHandler(data) {
+                                                            //    var id = d3.select(this).attr("id");
+                                                            //    console.log(id);
+                                                            //    console.log(data);
+                                                            //
+                                                            //}
+                                                            //creates a map given an array of summaries. Values are currently hardcoded
+                                                            //function setMaps() {
+                                                            //    var SummaryArray = new Array;
+                                                            //    var SummaryMap = new Map();
+                                                            //
+                                                            //    SummaryArray = ["summary0", "summary1", "summary2", "summary3", "summary4", "summary5", "summary6", "summary7", "summary8", "summary9", "summary10", "summary11",
+                                                            //        "summary12", "summary13", "summary14", "summary15", "summary16", "summary17", "summary18", "summary19", "summary20", "summary21", "summary22", "summary23", "summary24", "summary25"];
+                                                            //    var len = SummaryArray.length;
+                                                            //    for (var i = 0; i < len; i++) {
+                                                            //        elementId = idArray[i];
+                                                            //        value = SummaryArray[i]
+                                                            //        SummaryMap.set(elementId, value);
+                                                            //    }
+                                                            //    return SummaryMap;
+                                                            //}
+                                                            //Function for running tts and changing the summary text based on the bar being hovered
 </script>
