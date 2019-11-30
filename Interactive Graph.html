@@ -118,12 +118,16 @@
         }
         function addGraphListener(m) {
             var d3Id = "circle#Column" + m;
-            var chart = document.getElementById("chart").childNodes[0];
-            //chart2 = chart.childNodes.childNodes[3];
+            var chart = document.getElementById("chart").childNodes;
+            var chart2 = chart[0];
+            var chart3 = chart2.childNodes;
+            console.log(chart3[2]);
             //chart3 = chart2.childNodes[0];
-            x = chart.children[0].child;
-            x.getElementById("Column1");
-            //console.log(document.getElementsByTagName("circle"));
+            //x = chart.childNodes;
+            //x.getElementById("Column1");
+            for (var value of chart3.values()) {
+                console.log(value);
+            }
             //document.getElementById(chart2).addEventListener("mouseover", function () {
                 //element.setAttribute("style", "background-color: red;");
             //});
