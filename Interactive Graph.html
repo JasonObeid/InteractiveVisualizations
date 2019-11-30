@@ -74,7 +74,7 @@
         var yAxis = "";
         var jsonPath = "3001_1.json";
         var csvPath = "3001_1.csv";
-        var summaryPath = "3001_1_Summary.json"
+        var summaryPath = "3001_1_summary.json"
 
         //var jsonPath = "7920_0.json";
         //var summaryPath = "7920_0_Summary.json"
@@ -84,7 +84,7 @@
             if (graphType == "line") {
                 idArray = setGraphs(trendsArray);
                 lineGraph();
-                $(document).ready(setSummary(summaryArray));
+                setSummary(summaryArray);
             }
             else if (graphType == "bar") {
                 barGraph();
@@ -208,7 +208,7 @@
             request1.send();
             request1.onload = function () {
                 var jsonObj = request1.response;
-                var summaryArray = jsonObj.summmary;
+                var summaryArray = jsonObj.summary;
                 var trendsArray = jsonObj.trends;
                 run(summaryArray, trendsArray);
             }
@@ -233,8 +233,8 @@
             getMetaData();
             function lineGraph() {
                 var margin = { top: 10, right: 30, bottom: 30, left: 60 },
-                    width = 1000 - margin.left - margin.right,
-                    height = 600 - margin.top - margin.bottom;
+                    width = 960 - margin.left - margin.right,
+                    height = 540 - margin.top - margin.bottom;
 
                 // append the svg object to the body of the page
                 var svg = d3.select("#chart")
