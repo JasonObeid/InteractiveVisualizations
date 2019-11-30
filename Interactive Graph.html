@@ -74,7 +74,7 @@
         var yAxis = "";
         var jsonPath = "3001_1.json";
         var csvPath = "3001_1.csv";
-        var summaryPath = "3001_1_summary.json"
+        var summaryPath = "3001_1_Summary.json"
 
         //var jsonPath = "7920_0.json";
         //var summaryPath = "7920_0_Summary.json"
@@ -82,9 +82,9 @@
 
         function run(summaryArray, trendsArray) {
             if (graphType == "line") {
-                setSummary(summaryArray);
-                ids = setGraphs(trendsArray);
-                lineGraph(ids);
+                idArray = setGraphs(trendsArray);
+                lineGraph();
+                $(document).ready(setSummary(summaryArray));
             }
             else if (graphType == "bar") {
                 barGraph();
@@ -93,7 +93,7 @@
 
         function setSummary(summaryArray) {
             for (i = 0; i < summaryArray.length; i++) {
-                console.log(summaryArray[i]);
+                //console.log(summaryArray[i]);
                 var anchor = document.createElement("A");
                 id = "A" + i
                 anchor.setAttribute("id", id);
@@ -105,7 +105,7 @@
             }
         }
         function setGraphs(trendsArray) {
-            idArray = [];
+            var idArray = [];
             for (n = 0; n < trendsArray.length; n++) {
                 start = trendsArray[n].start;
                 end = trendsArray[n].end;
@@ -118,26 +118,25 @@
             }
             return idArray;
         }
-        function test1(id) { //object, trendsArray
-            //d3.select(this).attr("id");
-            for (i = 0; i < idArray.length; i++) {
-                if (idArray[i].includes(id)) {
-                    textid = "A" + (i + 1);
+        function test1(id) {
+            for (var k = 0; k < idArray.length; k++) {
+                if (idArray[k].includes(id)) {
+                    var textid = "A" + (k + 1);
                     document.getElementById(textid).style.backgroundColor = 'cyan';
-                    for (n = 0; n < idArray[i].length; n++) {
-                        document.getElementById(idArray[i][n]).style.fill = 'blue';
+                    for (var n = 0; n < idArray[k].length; n++) {
+                        document.getElementById(idArray[k][n]).style.fill = 'blue';
                     }
                 }
             }
         }
         function test2(id) { //object, trendsArray
             //d3.select(this).attr("id");
-            for (i = 0; i < idArray.length; i++) {
-                if (idArray[i].includes(id)) {
-                    textid = "A" + (i + 1);
+            for (var j = 0; j < idArray.length; j++) {
+                if (idArray[j].includes(id)) {
+                    var textid = "A" + (j + 1);
                     document.getElementById(textid).style.backgroundColor = 'transparent';
-                    for (n = 0; n < idArray[i].length; n++) {
-                        document.getElementById(idArray[i][n]).style.fill = 'grey';
+                    for (var m = 0; m < idArray[j].length; m++) {
+                        document.getElementById(idArray[j][m]).style.fill = 'grey';
                     }
                 }
             }
@@ -152,12 +151,19 @@
             //add listener for summary anchor
             document.getElementById(id).addEventListener("mouseover", function () {
                 document.getElementById(id).style.backgroundColor = 'cyan';
+                var graphIds = idArray[i - 1];
+                for (var n = 0; n < graphIds.length; n++) {
+                    document.getElementById(graphIds[n]).style.fill = 'blue';
+                }
             });
             document.getElementById(id).addEventListener("mouseout", function () {
                 document.getElementById(id).style.backgroundColor = 'transparent';
+                var graphIds = idArray[i - 1];
+                for (var n = 0; n < graphIds.length; n++) {
+                    document.getElementById(graphIds[n]).style.fill = 'grey';
+                }
             });
         }
-
         function setTitle(x, y, graph) {
             xAxis = x.replace(/_/g, " ");
             yAxis = y.replace(/_/g, " ");
@@ -225,7 +231,7 @@
         <script src="d3-tip.js"></script>
         <script>
             getMetaData();
-            function lineGraph(idArray) {
+            function lineGraph() {
                 var margin = { top: 10, right: 30, bottom: 30, left: 60 },
                     width = 1000 - margin.left - margin.right,
                     height = 600 - margin.top - margin.bottom;
