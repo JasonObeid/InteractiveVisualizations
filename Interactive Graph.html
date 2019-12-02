@@ -56,6 +56,10 @@
     p:focus {
         background-color: #f00;
     }
+
+    table {
+        text-align: center;
+    }
 </style>
 
 <html>
@@ -70,93 +74,96 @@
         var yAxis = "";
         var jsonPath = "3001_1.json";
         var csvPath = "3001_1.csv";
-        var summaryPath = "3001_1_summary.json"
+        var summaryPath = "3001_1_Summary.json"
 
         //var jsonPath = "7920_0.json";
         //var summaryPath = "7920_0_Summary.json"
         //var csvPath = "7920_0.csv";
 
         function run(summaryArray, trendsArray) {
-            console.log(summaryArray);
             if (graphType == "line") {
+                idArray = setGraphs(trendsArray);
                 lineGraph();
-                $(document).ready(function () {
-                    setSummary(summaryArray);
-                    setGraphs(trendsArray);
-                });
-
+                $(document).ready(setSummary(summaryArray));
             }
             else if (graphType == "bar") {
                 barGraph();
-                $(document).ready(function () {
-                    setSummary(summaryArray);
-                });
             }
         }
 
         function setSummary(summaryArray) {
             for (i = 0; i < summaryArray.length; i++) {
-                console.log(summaryArray[i]);
+                //console.log(summaryArray[i]);
                 var anchor = document.createElement("A");
                 id = "A" + i
                 anchor.setAttribute("id", id);
                 anchor.innerHTML = summaryArray[i];
                 document.getElementById('summary').appendChild(anchor);
                 if (i > 0) {
-                    addTextListener(id);
+                    addTextListener(id, i);
                 }
             }
         }
         function setGraphs(trendsArray) {
+            var idArray = [];
             for (n = 0; n < trendsArray.length; n++) {
                 start = trendsArray[n].start;
                 end = trendsArray[n].end;
+                ids = [];
                 for (m = start; m <= end; m++) {
-                    addGraphListener(m);
+                    var id = "Column" + m;
+                    ids.push(id);
+                }
+                idArray.push(ids);
+            }
+            return idArray;
+        }
+        function test1(id) {
+            for (var k = 0; k < idArray.length; k++) {
+                if (idArray[k].includes(id)) {
+                    var textid = "A" + (k + 1);
+                    document.getElementById(textid).style.backgroundColor = 'cyan';
+                    for (var n = 0; n < idArray[k].length; n++) {
+                        document.getElementById(idArray[k][n]).style.fill = 'blue';
+                    }
                 }
             }
         }
-        function addGraphListener(m) {
-            var d3Id = "circle#Column" + m;
-            var chart = document.getElementById("chart").childNodes;
-            var chart2 = chart[0];
-            var chart3 = chart2.childNodes;
-            console.log(chart3[2]);
-            //chart3 = chart2.childNodes[0];
-            //x = chart.childNodes;
-            //x.getElementById("Column1");
-            for (var value of chart3.values()) {
-                console.log(value);
+        function test2(id) { //object, trendsArray
+            //d3.select(this).attr("id");
+            for (var j = 0; j < idArray.length; j++) {
+                if (idArray[j].includes(id)) {
+                    var textid = "A" + (j + 1);
+                    document.getElementById(textid).style.backgroundColor = 'transparent';
+                    for (var m = 0; m < idArray[j].length; m++) {
+                        document.getElementById(idArray[j][m]).style.fill = 'grey';
+                    }
+                }
             }
-            //document.getElementById(chart2).addEventListener("mouseover", function () {
-                //element.setAttribute("style", "background-color: red;");
-            //});
         }
-        //var d3Id = "circle#Column" + m + ".dot";
-
-        //var circle = svg.selectAll(d3Id).data(data) // UPDATE
-        //    .style("fill", "blue");
-
         //copy path
         //clone node
         //var res = str.split(",");
         //var h = document.getElementById("myH2");
         //h.insertAdjacentHTML("afterend", "<path>My new paragraph</path>");
 
-        //document.getElementById(d3Id).addEventListener("mouseover", function () {
-        //    d3.select(d3Id).attr("fill", "red")
-        //});
-
-        function addTextListener(id) {
+        function addTextListener(id, i) {
             //add listener for summary anchor
             document.getElementById(id).addEventListener("mouseover", function () {
                 document.getElementById(id).style.backgroundColor = 'cyan';
+                var graphIds = idArray[i - 1];
+                for (var n = 0; n < graphIds.length; n++) {
+                    document.getElementById(graphIds[n]).style.fill = 'blue';
+                }
             });
             document.getElementById(id).addEventListener("mouseout", function () {
                 document.getElementById(id).style.backgroundColor = 'transparent';
+                var graphIds = idArray[i - 1];
+                for (var n = 0; n < graphIds.length; n++) {
+                    document.getElementById(graphIds[n]).style.fill = 'grey';
+                }
             });
         }
-
         function setTitle(x, y, graph) {
             xAxis = x.replace(/_/g, " ");
             yAxis = y.replace(/_/g, " ");
@@ -225,7 +232,6 @@
         <script>
             getMetaData();
             function lineGraph() {
-
                 var margin = { top: 10, right: 30, bottom: 30, left: 60 },
                     width = 1000 - margin.left - margin.right,
                     height = 600 - margin.top - margin.bottom;
@@ -282,9 +288,19 @@
                         .attr("cy", function (d) { return y(d[getY(d)]) })
                         .attr("r", 5)
                         .attr("fill", "grey")
+                        //.attr("onmouseover", "test(this)") //test(this, trendsArray)
+                        //.attr("onmouseout", "test(this)")
                         .each(setId)
-                        .on('mouseover', tip.show)
-                        .on('mouseout', tip.hide);
+                        .on('mouseover', function (d) {
+                            id = this.getAttribute("id")
+                            test1(id)
+                            tip.show
+                        })
+                        .on('mouseout', function (d) {
+                            id = this.getAttribute("id")
+                            test2(id)
+                            tip.show
+                        })
                 });
             }
 
@@ -350,11 +366,15 @@
                         })
                         .attr("xVal", function (d) { return d[getX(d)] })
                         .attr("yVal", function (d) { return d[getY(d)] })
+                        //.attr("onmouseover", "test()") //test(this, trendsArray)
+                        //.attr("onmouseout", "test()")
                         .on('mouseover', tip.show)
                         .on('mouseout', tip.hide)
                         .attr("fill", "#3093cf")
-                        .each(setId);
-
+                        .each(function (d) {
+                            setId
+                            test(this, idArray)
+                        });
                 });
                 x = document.getElementById("#Column1");
                 console.log(x);
@@ -393,44 +413,24 @@
             }
         </script>
     </section>
-    <audio id="audioPlayback" controls>
-        <source id="audioSource" type="audio/mp3" src="">
-    </audio>
-    <table>
+    <table width="50%" cellpadding="5">
         <tr>
             <td colspan="2"><h1 id="title"></h1></td>
         </tr>
         <tr>
-            <td><h4 id="summaryText" width="50%">Hover over a bar to hear its caption</h4></td>
-            <td><h4 id="summary" width="50%"></h4></td>
+            <td><h3 id="summaryText">Hover over a bar to hear its caption</h3></td>
         </tr>
         <tr id="chart" colspan="2"></tr>
+        <tr>
+            <td><p id="summary"></p></td>
+        </tr>
+        <tr>
+            <td>
+                <audio id="audioPlayback" controls>
+                    <source id="audioSource" type="audio/mp3" src="">
+                </audio>
+            </td>
+        </tr>
     </table>
 </body>
-
 </html>
-<script>
-                                                                //adds hover event handler for each d3 bar element
-                                                                    //function addHandler(data) {
-                                                                    //    var id = d3.select(this).attr("id");
-                                                                    //    console.log(id);
-                                                                    //    console.log(data);
-                                                                    //
-                                                                    //}
-                                                                    //creates a map given an array of summaries. Values are currently hardcoded
-                                                                    //function setMaps() {
-                                                                    //    var SummaryArray = new Array;
-                                                                    //    var SummaryMap = new Map();
-                                                                    //
-                                                                    //    SummaryArray = ["summary0", "summary1", "summary2", "summary3", "summary4", "summary5", "summary6", "summary7", "summary8", "summary9", "summary10", "summary11",
-                                                                    //        "summary12", "summary13", "summary14", "summary15", "summary16", "summary17", "summary18", "summary19", "summary20", "summary21", "summary22", "summary23", "summary24", "summary25"];
-                                                                    //    var len = SummaryArray.length;
-                                                                    //    for (var i = 0; i < len; i++) {
-                                                                    //        elementId = idArray[i];
-                                                                    //        value = SummaryArray[i]
-                                                                    //        SummaryMap.set(elementId, value);
-                                                                    //    }
-                                                                    //    return SummaryMap;
-                                                                    //}
-                                                                    //Function for running tts and changing the summary text based on the bar being hovered
-</script>
