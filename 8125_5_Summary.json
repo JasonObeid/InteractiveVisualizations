@@ -1,1 +1,1 @@
-{"summmary": "This is the bar chart which describes the relationship between the x axis of rating and the y axis of country. From the country values of AFG to ZAF, there is an increasing trend. We find the maximum value for rating of 4.0 in country at GHA. We find the minimum value for rating of 0.0 in country at ZAF. "}
+{"summary": ["This bar chart has 20 categories for the nominal data of country.", " The highest value is found at GHA with a rating of 4.0.", " The lowest value is found at IRQ with a rating of 0.0."], "trends": {"maxIndex": 16, "minIndex": 5}}
