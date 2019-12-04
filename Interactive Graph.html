@@ -18,9 +18,7 @@
     .bar {
     }
 
-        .bar:hover {
-            fill: #CF6C30;
-        }
+
 
     .x.axis path {
         display: none;
@@ -68,17 +66,20 @@
 </head>
 
 <body>
-    <script src="jquery-3.4.1.js"></script>
     <script>
         var xAxis = "";
         var yAxis = "";
-        var jsonPath = "3001_1.json";
-        var csvPath = "3001_1.csv";
-        var summaryPath = "3001_1_summary.json"
+        //var jsonPath = "3001_1.json";
+        //var csvPath = "3001_1.csv";
+        //var summaryPath = "3001_1_summary.json"
 
-        //var jsonPath = "7920_0.json";
-        //var summaryPath = "7920_0_Summary.json"
-        //var csvPath = "7920_0.csv";
+        var jsonPath = "7920_0.json";
+        var summaryPath = "7920_0_summary.json";
+        var csvPath = "7920_0.csv";
+
+        //var jsonPath = "2836_0.json";
+        //var summaryPath = "2836_0_summary.json"
+        //var csvPath = "2836_0.csv";
 
         function run(summaryArray, trendsArray) {
             if (graphType == "line") {
@@ -87,7 +88,9 @@
                 setSummary(summaryArray);
             }
             else if (graphType == "bar") {
+                idArray = setBarGraphs(trendsArray);
                 barGraph();
+                setSummary(summaryArray);
             }
         }
 
@@ -118,7 +121,18 @@
             }
             return idArray;
         }
-        function test1(id) {
+
+        function setBarGraphs(trendsArray) {
+            var idArray = [];
+            var ids = []
+            var min = trendsArray["minIndex"];
+            var max = trendsArray["maxIndex"];
+            ids.push("Column" + min);
+            ids.push("Column" + max);
+            idArray.push(ids);
+            return idArray;
+        }
+        function lineListenerOver(id) {
             for (var k = 0; k < idArray.length; k++) {
                 if (idArray[k].includes(id)) {
                     var textid = "A" + (k + 1);
@@ -129,8 +143,7 @@
                 }
             }
         }
-        function test2(id) { //object, trendsArray
-            //d3.select(this).attr("id");
+        function lineListenerOut(id) {
             for (var j = 0; j < idArray.length; j++) {
                 if (idArray[j].includes(id)) {
                     var textid = "A" + (j + 1);
@@ -141,6 +154,34 @@
                 }
             }
         }
+        function barListenerOver(id) {
+            maxID = idArray[0][1];
+            minID = idArray[0][0];
+            if (id == maxID) {
+                var textid = "A1"
+                document.getElementById(textid).style.backgroundColor = 'cyan';
+                document.getElementById(maxID).style.fill = 'blue';
+            }
+            if (id == minID) {
+                var textid = "A2"
+                document.getElementById(textid).style.backgroundColor = 'cyan';
+                document.getElementById(minID).style.fill = 'blue';
+            }
+        }
+        function barListenerOut(id) {
+            maxID = idArray[0][1];
+            minID = idArray[0][0];
+            if (id == maxID) {
+                var textid = "A1"
+                document.getElementById(textid).style.backgroundColor = 'transparent';
+                document.getElementById(maxID).style.fill = 'grey';
+            }
+            if (id == minID) {
+                var textid = "A2"
+                document.getElementById(textid).style.backgroundColor = 'transparent';
+                document.getElementById(minID).style.fill = 'grey';
+            }
+        }
         //copy path
         //clone node
         //var res = str.split(",");
@@ -149,20 +190,48 @@
 
         function addTextListener(id, i) {
             //add listener for summary anchor
-            document.getElementById(id).addEventListener("mouseover", function () {
-                document.getElementById(id).style.backgroundColor = 'cyan';
-                var graphIds = idArray[i - 1];
-                for (var n = 0; n < graphIds.length; n++) {
-                    document.getElementById(graphIds[n]).style.fill = 'blue';
+            if (graphType == "bar") {
+                maxID = idArray[0][1];
+                minID = idArray[0][0];
+                if (id == "A1") {
+                    document.getElementById(id).addEventListener("mouseover", function () {
+                        document.getElementById(id).style.backgroundColor = 'cyan';
+                        document.getElementById(maxID).style.fill = 'blue';
+
+                    });
+                    document.getElementById(id).addEventListener("mouseout", function () {
+                        document.getElementById(id).style.backgroundColor = 'transparent';
+                        document.getElementById(maxID).style.fill = 'grey';
+                    });
                 }
-            });
-            document.getElementById(id).addEventListener("mouseout", function () {
-                document.getElementById(id).style.backgroundColor = 'transparent';
-                var graphIds = idArray[i - 1];
-                for (var n = 0; n < graphIds.length; n++) {
-                    document.getElementById(graphIds[n]).style.fill = 'grey';
+                if (id == "A2") {
+                    document.getElementById(id).addEventListener("mouseover", function () {
+                        document.getElementById(id).style.backgroundColor = 'cyan';
+                        document.getElementById(minID).style.fill = 'blue';
+                    });
+                    document.getElementById(id).addEventListener("mouseout", function () {
+                        document.getElementById(id).style.backgroundColor = 'transparent';
+                        document.getElementById(minID).style.fill = 'grey';
+                    });
                 }
-            });
+            }
+            else {
+                document.getElementById(id).addEventListener("mouseover", function () {
+                    document.getElementById(id).style.backgroundColor = 'cyan';
+                    var graphIds = idArray[i - 1];
+                    for (var n = 0; n < graphIds.length; n++) {
+                        console.log(graphIds[n]);
+                        document.getElementById(graphIds[n]).style.fill = 'blue';
+                    }
+                });
+                document.getElementById(id).addEventListener("mouseout", function () {
+                    document.getElementById(id).style.backgroundColor = 'transparent';
+                    var graphIds = idArray[i - 1];
+                    for (var n = 0; n < graphIds.length; n++) {
+                        document.getElementById(graphIds[n]).style.fill = 'grey';
+                    }
+                });
+            }
         }
         function setTitle(x, y, graph) {
             xAxis = x.replace(/_/g, " ");
@@ -288,17 +357,15 @@
                         .attr("cy", function (d) { return y(d[getY(d)]) })
                         .attr("r", 5)
                         .attr("fill", "grey")
-                        //.attr("onmouseover", "test(this)") //test(this, trendsArray)
-                        //.attr("onmouseout", "test(this)")
                         .each(setId)
                         .on('mouseover', function (d) {
                             id = this.getAttribute("id")
-                            test1(id)
+                            lineListenerOver(id)
                             tip.show
                         })
                         .on('mouseout', function (d) {
                             id = this.getAttribute("id")
-                            test2(id)
+                            lineListenerOut(id)
                             tip.show
                         })
                 });
@@ -366,18 +433,19 @@
                         })
                         .attr("xVal", function (d) { return d[getX(d)] })
                         .attr("yVal", function (d) { return d[getY(d)] })
-                        //.attr("onmouseover", "test()") //test(this, trendsArray)
-                        //.attr("onmouseout", "test()")
-                        .on('mouseover', tip.show)
-                        .on('mouseout', tip.hide)
+                        .each(setId)
                         .attr("fill", "#3093cf")
-                        .each(function (d) {
-                            setId
-                            test(this, idArray)
+                        .on('mouseover', function (d) {
+                            id = this.getAttribute("id")
+                            barListenerOver(id)
+                            tip.show
+                        })
+                        .on('mouseout', function (d) {
+                            id = this.getAttribute("id")
+                            barListenerOut(id)
+                            tip.show
                         });
                 });
-                x = document.getElementById("#Column1");
-                console.log(x);
             }
         </script>
 

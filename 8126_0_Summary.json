@@ -1,1 +1,1 @@
-{"summmary": "This is the bar chart which describes the relationship between the x axis of count and the y axis of Platform. From the Platform values of bsd to php, there is an increasing trend. We find the maximum value for count of 15233 in Platform at php. We find the minimum value for count of 80 in Platform at bsd. "}
+{"summary": ["This bar chart has 15 categories for the nominal data of Platform.", " The highest value is found at php with a count of 15233.", " The lowest value is found at bsd with a count of 80."], "trends": {"maxIndex": 14, "minIndex": 0}}
