@@ -1,3 +1,3 @@
 ﻿# InteractiveVisualizations-
  
- D3 graphs only load when hosting the html file on an http server
+ D3 graphs only load when running on an http server

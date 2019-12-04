@@ -69,13 +69,14 @@
     <script>
         var xAxis = "";
         var yAxis = "";
-        //var jsonPath = "3001_1.json";
-        //var csvPath = "3001_1.csv";
-        //var summaryPath = "3001_1_summary.json"
+        
+        var jsonPath = "/JasonObeid/InteractiveVisualizations/data/d3/specs/3001_1.json";
+        var csvPath = "/JasonObeid/InteractiveVisualizations/data/d3/data/3001_1.csv";
+        var summaryPath = "/JasonObeid/InteractiveVisualizations/data/d3/summaries/3001_1_summary.json";
 
-        var jsonPath = "7920_0.json";
-        var summaryPath = "7920_0_summary.json";
-        var csvPath = "7920_0.csv";
+        //var jsonPath = "7920_0.json";
+        //var summaryPath = "7920_0_summary.json";
+        //var csvPath = "7920_0.csv";
 
         //var jsonPath = "2836_0.json";
         //var summaryPath = "2836_0_summary.json"
@@ -220,7 +221,6 @@
                     document.getElementById(id).style.backgroundColor = 'cyan';
                     var graphIds = idArray[i - 1];
                     for (var n = 0; n < graphIds.length; n++) {
-                        console.log(graphIds[n]);
                         document.getElementById(graphIds[n]).style.fill = 'blue';
                     }
                 });
