@@ -1,0 +1,483 @@
+<style>
+
+    body {
+        font: 10px sans-serif;
+    }
+
+    .x.axis path {
+        display: none;
+    }
+    a.outline{
+        text-shadow: 0.5px 1px #ffcea6;
+    }
+    .d3-tip {
+        line-height: 1;
+        font-weight: bold;
+        padding: 12px;
+        background: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        border-radius: 2px;
+    }
+        /* Creates a small triangle extender for the tooltip */
+        .d3-tip:after {
+            box-sizing: border-box;
+            display: inline;
+            font-size: 10px;
+            width: 100%;
+            line-height: 1;
+            color: rgba(0, 0, 0, 0.8);
+            content: "\25BC";
+            position: absolute;
+            text-align: center;
+        }
+        /* Style northward tooltips differently */
+        .d3-tip.n:after {
+            margin: -1px 0 0 0;
+            top: 100%;
+            left: 0;
+        }
+
+    table {
+        text-align: center;
+    }
+
+    #title {
+        font: 32px helvetica;
+        text-align: center;
+    }
+</style>
+
+<html>
+
+<head>
+</head>
+
+<body>
+    <script>
+        var xAxis = "";
+        var yAxis = "";
+
+        var rootName = "3001_1";
+        //var rootName = "7920_0";
+        //var rootName = "2836_3";
+        var jsonPath = "/InteractiveVisualizations/data/d3/specs/" + rootName + ".json";
+        var csvPath = "/InteractiveVisualizations/data/d3/data/" + rootName + ".csv";
+        var summaryPath = "/InteractiveVisualizations/data/d3/summaries/" + rootName + "_summary.json";
+
+        function run(summaryArray, trendsArray) {
+            if (graphType == "line") {
+                idArray = setGraphs(trendsArray);
+                lineGraph();
+                setSummary(summaryArray);
+            }
+            else if (graphType == "bar") {
+                idArray = setBarGraphs(trendsArray);
+                barGraph();
+                setSummary(summaryArray);
+            }
+        }
+
+        function setSummary(summaryArray) {
+            for (i = 0; i < summaryArray.length; i++) {
+                //console.log(summaryArray[i]);
+                var anchor = document.createElement("A");
+                id = "A" + i
+                anchor.setAttribute("id", id);
+                anchor.innerHTML = summaryArray[i];
+                document.getElementById('summary').appendChild(anchor);
+                if (i > 0) {
+                    anchor.setAttribute("class", "outline");
+                    addTextListener(id, i);
+                }
+            }
+        }
+        function setGraphs(trendsArray) {
+            var idArray = [];
+            for (n = 0; n < trendsArray.length; n++) {
+                start = trendsArray[n].start;
+                end = trendsArray[n].end;
+                ids = [];
+                for (m = start; m <= end; m++) {
+                    var id = "Column" + m;
+                    ids.push(id);
+                }
+                idArray.push(ids);
+            }
+            return idArray;
+        }
+
+        function setBarGraphs(trendsArray) {
+            var idArray = [];
+            var ids = []
+            var min = trendsArray["minIndex"];
+            var max = trendsArray["maxIndex"];
+            ids.push("Column" + min);
+            ids.push("Column" + max);
+            idArray.push(ids);
+            return idArray;
+        }
+        function lineListenerOver(id) {
+            for (var k = 0; k < idArray.length; k++) {
+                if (idArray[k].includes(id)) {
+                    var textid = "A" + (k + 1);
+                    document.getElementById(textid).style.backgroundColor = '#d9f6ff';
+                    for (var n = 0; n < idArray[k].length; n++) {
+                        document.getElementById(idArray[k][n]).style.fill = '#cf6830';
+                    }
+                }
+            }
+        }
+        function lineListenerOut(id) {
+            for (var j = 0; j < idArray.length; j++) {
+                if (idArray[j].includes(id)) {
+                    var textid = "A" + (j + 1);
+                    document.getElementById(textid).style.backgroundColor = 'transparent';
+                    for (var m = 0; m < idArray[j].length; m++) {
+                        document.getElementById(idArray[j][m]).style.fill = 'grey';
+                    }
+                }
+            }
+        }
+        function barListenerOver(id) {
+            maxID = idArray[0][1];
+            minID = idArray[0][0];
+            if (id == maxID) {
+                var textid = "A1"
+                document.getElementById(textid).style.backgroundColor = '#d9f6ff';
+                document.getElementById(maxID).style.fill = '#cf6830';
+            }
+            if (id == minID) {
+                var textid = "A2"
+                document.getElementById(textid).style.backgroundColor = '#d9f6ff';
+                document.getElementById(minID).style.fill = '#cf6830';
+            }
+        }
+        function barListenerOut(id) {
+            maxID = idArray[0][1];
+            minID = idArray[0][0];
+            if (id == maxID) {
+                var textid = "A1"
+                document.getElementById(textid).style.backgroundColor = 'transparent';
+                document.getElementById(maxID).style.fill = '#3093cf';
+            }
+            if (id == minID) {
+                var textid = "A2"
+                document.getElementById(textid).style.backgroundColor = 'transparent';
+                document.getElementById(minID).style.fill = '#3093cf';
+            }
+        }
+        //copy path
+        //clone node
+        //var res = str.split(",");
+        //var h = document.getElementById("myH2");
+        //h.insertAdjacentHTML("afterend", "<path>My new paragraph</path>");
+
+        function addTextListener(id, i) {
+            //add listener for summary anchor
+            if (graphType == "bar") {
+                maxID = idArray[0][1];
+                minID = idArray[0][0];
+                if (id == "A1") {
+                    document.getElementById(id).addEventListener("mouseover", function () {
+                        document.getElementById(id).style.backgroundColor = '#d9f6ff';
+                        document.getElementById(maxID).style.fill = '#cf6830';
+
+                    });
+                    document.getElementById(id).addEventListener("mouseout", function () {
+                        document.getElementById(id).style.backgroundColor = 'transparent';
+                        document.getElementById(maxID).style.fill = '#3093cf';
+                    });
+                }
+                if (id == "A2") {
+                    document.getElementById(id).addEventListener("mouseover", function () {
+                        document.getElementById(id).style.backgroundColor = '#d9f6ff';
+                        document.getElementById(minID).style.fill = '#cf6830';
+                    });
+                    document.getElementById(id).addEventListener("mouseout", function () {
+                        document.getElementById(id).style.backgroundColor = 'transparent';
+                        document.getElementById(minID).style.fill = '#3093cf';
+                    });
+                }
+            }
+            else {
+                document.getElementById(id).addEventListener("mouseover", function () {
+                    document.getElementById(id).style.backgroundColor = '#d9f6ff';
+                    var graphIds = idArray[i - 1];
+                    for (var n = 0; n < graphIds.length; n++) {
+                        document.getElementById(graphIds[n]).style.fill = '#cf6830';
+                    }
+                });
+                document.getElementById(id).addEventListener("mouseout", function () {
+                    document.getElementById(id).style.backgroundColor = 'transparent';
+                    var graphIds = idArray[i - 1];
+                    for (var n = 0; n < graphIds.length; n++) {
+                        document.getElementById(graphIds[n]).style.fill = 'grey';
+                    }
+                });
+            }
+        }
+        function setTitle(x, y, graph) {
+            xAxis = x.replace(/_/g, " ");
+            yAxis = y.replace(/_/g, " ");
+            xLabel = x;
+            yLabel = y;
+            var title = graph + " graph of " + xAxis + " at " + yAxis;
+            document.getElementById('title').innerText = title;
+        }
+        var count = 0;
+        function setId() {
+            var id = ("Column" + count)
+            d3.select(this).attr("id", id);
+            xValue = d3.select(this).attr("xVal");
+            yValue = d3.select(this).attr("yVal");
+            var string = yAxis + " is " + yValue + " at " + xAxis + " " + xValue;
+            document.getElementById(id).addEventListener("mouseover", function () {
+                textChange(string);
+            });
+            count = count + 1;
+        }
+
+        function textChange(text) {
+            document.getElementById("summaryText").innerText = text;
+            speakText(text);
+        }
+
+        function getMetaData() {
+            var metaRequestURL = jsonPath;
+            var metaRequest = new XMLHttpRequest();
+            metaRequest.open('GET', metaRequestURL);
+            metaRequest.responseType = 'json';
+            metaRequest.send();
+            metaRequest.onload = function () {
+                var jsonObj = metaRequest.response;
+                yAxis = jsonObj['encoding']["y"]["field"];
+                xAxis = jsonObj['encoding']["x"]["field"];
+                graphType = jsonObj['mark'];
+                setTitle(xAxis, yAxis, graphType);
+            }
+            var summaryRequestURL = summaryPath;
+            var summaryRequest = new XMLHttpRequest();
+            summaryRequest.open('GET', summaryRequestURL);
+            summaryRequest.responseType = 'json';
+            summaryRequest.send();
+            summaryRequest.onload = function () {
+                var jsonObj = summaryRequest.response;
+                var summaryArray = jsonObj.summary;
+                var trendsArray = jsonObj.trends;
+                run(summaryArray, trendsArray);
+            }
+        }
+    </script>
+
+    <section id="graph">
+
+        <!--Bar graph with-->
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+        <script src="d3-tip.js"></script>
+        <script>
+            getMetaData();
+            function lineGraph() {
+                var margin = { top: 10, right: 30, bottom: 30, left: 60 },
+                    width = 960 - margin.left - margin.right,
+                    height = 540 - margin.top - margin.bottom;
+
+                // append the svg object to the body of the page
+                var svg = d3.select("#chart")
+                    .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform",
+                        "translate(" + margin.left + "," + margin.top + ")");
+
+                //Read the data
+                console.log(xLabel);
+                console.log(yLabel);
+                d3.csv(csvPath).then(function (data) {
+                    var x = d3.scaleBand()
+                        .domain(data.map(function (d) { return d[xLabel]; }))
+                        .range([0, width])
+                        .padding(0);
+                    svg.append("g")
+                        .attr("transform", "translate(0," + height + ")")
+                        .call(d3.axisBottom(x));
+                    // Add Y axis
+                    var y = d3.scaleLinear()
+                        .domain([0, d3.max(data, function (d) { return +d[yLabel]; })])
+                        .range([height, 0]);
+                    svg.append("g")
+                        .call(d3.axisLeft(y));
+                    var tip = d3.tip()
+                        .attr('class', 'd3-tip')
+                        .offset([-10, 0])
+                        .html(function (d) {
+                            return "<strong> " + yAxis + ":</strong> <span style='color:red'>" + d[yLabel] + "</span>";
+                        })
+                    svg.call(tip);
+                    // Add the line
+                    svg.append("path")
+                        .datum(data)
+                        .attr("id", "path1")
+                        .attr("fill", "none")
+                        .attr("stroke", "steelblue")
+                        .attr("stroke-width", 1.5)
+                        .attr("d", d3.line()
+                            .x(function (d) { return x(d[xLabel]) })
+                            .y(function (d) { return y(d[yLabel]) })
+                        );
+
+                    svg.selectAll(".dot")
+                        .data(data)
+                        .enter().append("circle")
+                        .attr("class", "dot") // Assign a class for styling
+                        .attr("xVal", function (d) { return d[xLabel] })
+                        .attr("yVal", function (d) { return d[yLabel] })
+                        .attr("cx", function (d) { return x(d[xLabel]) })
+                        .attr("cy", function (d) { return y(d[yLabel]) })
+                        .attr("r", 5)
+                        .attr("fill", "grey")
+                        .each(setId)
+                        .on('mouseover', function (d) {
+                            id = this.getAttribute("id")
+                            lineListenerOver(id)
+                            tip.show
+                        })
+                        .on('mouseout', function (d) {
+                            id = this.getAttribute("id")
+                            lineListenerOut(id)
+                            tip.show
+                        })
+                });
+            }
+
+            function barGraph() {
+                var margin = { top: 40, right: 80, bottom: 30, left: 90 },
+                    width = 960 - margin.left - margin.right,
+                    height = 600 - margin.top - margin.bottom;
+
+                var x = d3.scaleBand()
+                    .rangeRound([0, width])
+                    .padding(0);
+
+                var y = d3.scaleLinear()
+                    .rangeRound([height, 0]);
+
+                var tip = d3.tip()
+                    .attr('class', 'd3-tip')
+                    .offset([-10, 0])
+                    .html(function (d) {
+                        return "<strong> " + yLabel + ":</strong> <span style='color:red'>" + d[yLabel] + "</span>";
+                    })
+
+                var svg = d3.select("#chart").append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+                svg.call(tip);
+
+                d3.csv(csvPath).then(function (data) {
+                    x.domain(data.map(function (d) {
+                        return d[xLabel];
+                    }));
+                    y.domain([0, d3.max(data, function (d) {
+                        return d3.format(".1e")(d[yLabel]);
+                    })]);
+                    svg.append("g")
+                        .attr("transform", "translate(0," + height + ")")
+                        .call(d3.axisBottom(x));
+
+                    svg.append("g")
+                        .call(d3.axisLeft(y))
+                        .append("text")
+                        .attr("transform", "rotate(-90)")
+                        .attr("y", 6)
+                        .attr("dy", ".71em")
+                        .style("text-anchor", "end");
+
+                    svg.selectAll(".bar")
+                        .data(data)
+                        .enter().append("rect")
+                        .attr("class", "bar")
+                        .attr("x", function (d) {
+                            return x(d[xLabel]);
+                        })
+                        .attr("width", x.bandwidth())
+                        .attr("y", function (d) {
+                            return y(d[yLabel]);
+                        })
+                        .attr("height", function (d) {
+                            return height - y(d[yLabel]);
+                        })
+                        .attr("xVal", function (d) { return d[xLabel] })
+                        .attr("yVal", function (d) { return d[yLabel] })
+                        .each(setId)
+                        .attr("fill", "#3093cf")
+                        .on('mouseover', function (d) {
+                            id = this.getAttribute("id")
+                            barListenerOver(id)
+                            tip.show
+                        })
+                        .on('mouseout', function (d) {
+                            id = this.getAttribute("id")
+                            barListenerOut(id)
+                            tip.show
+                        });
+                });
+            }
+        </script>
+
+        <!--Text to speech-->
+        <script src="https://sdk.amazonaws.com/js/aws-sdk-2.529.0.min.js"></script>
+        <script type="text/javascript">
+            // Initialize the Amazon Cognito credentials provider
+            AWS.config.region = 'us-east-1';
+            AWS.config.credentials = new AWS.CognitoIdentityCredentials({ IdentityPoolId: 'us-east-1:1dbc5481-8414-4da8-9fd9-2ecd12443250' });
+            function speakText(text) {
+                // Create the JSON parameters for getSynthesizeSpeechUrl
+                var speechParams = {
+                    OutputFormat: "mp3",
+                    Engine: "neural",
+                    SampleRate: "16000",
+                    Text: text,
+                    TextType: "text",
+                    VoiceId: "Matthew"
+                };
+                // Create the Polly service object and presigner object
+                var polly = new AWS.Polly({ apiVersion: '2016-06-10' });
+                var signer = new AWS.Polly.Presigner(speechParams, polly)
+                // Create presigned URL of synthesized speech file
+                signer.getSynthesizeSpeechUrl(speechParams, function (error, url) {
+                    if (error) {
+                        window.alert("AWS Polly error");
+                    } else {
+                        document.getElementById('audioSource').src = url;
+                        document.getElementById('audioPlayback').load();
+                        document.getElementById('audioPlayback').play();
+                    }
+                });
+            }
+        </script>
+    </section>
+    <table width="50%" cellpadding="5">
+        <tr>
+            <td colspan="2"><h1 id="title"></h1></td>
+        </tr>
+        <tr>
+            <td><h3 id="summaryText">Hover over a bar to hear its caption</h3></td>
+        </tr>
+        <tr id="chart" colspan="2"></tr>
+        <tr>
+            <td><p id="summary"></p></td>
+        </tr>
+        <tr>
+            <td>
+                <audio id="audioPlayback" controls>
+                    <source id="audioSource" type="audio/mp3" src="">
+                </audio>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
