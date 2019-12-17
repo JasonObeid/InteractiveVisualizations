@@ -60,9 +60,9 @@
         var rootName = "3001_1";
         //var rootName = "7920_0";
         //var rootName = "2836_3";
-        var jsonPath = "/JasonObeid/InteractiveVisualizations/data/d3/specs/" + rootName + ".json";
-        var csvPath = "/JasonObeid/InteractiveVisualizations/data/d3/data/" + rootName + ".csv";
-        var summaryPath = "/JasonObeid/InteractiveVisualizations/data/d3/summaries/" + rootName + "_summary.json";
+        var jsonPath = "/InteractiveVisualizations/data/d3/specs/" + rootName + ".json";
+        var csvPath = "/InteractiveVisualizations/data/d3/data/" + rootName + ".csv";
+        var summaryPath = "/InteractiveVisualizations/data/d3/summaries/" + rootName + "_summary.json";
 
         function run(summaryArray, trendsArray) {
             if (graphType == "line") {
@@ -211,7 +211,7 @@
                     document.getElementById(id).style.backgroundColor = 'transparent';
                     var graphIds = idArray[i - 1];
                     for (var n = 0; n < graphIds.length; n++) {
-                        document.getElementById(graphIds[n]).style.fill = '#cf6830';
+                        document.getElementById(graphIds[n]).style.fill = 'grey';
                     }
                 });
             }
