@@ -2,8 +2,10 @@
   "ExpandedNodes": [
     "",
     "\\data",
-    "\\data\\d3"
+    "\\data\\d3",
+    "\\data\\d3\\specs",
+    "\\demo"
   ],
-  "SelectedNode": "\\2836_3_summary.json",
+  "SelectedNode": "\\aws-sdk.min.js",
   "PreviewInSolutionExplorer": false
 }
