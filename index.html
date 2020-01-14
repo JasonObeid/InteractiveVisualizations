@@ -56,12 +56,17 @@
     <script>
         var xAxis = "";
         var yAxis = "";
-
-        var rootName = "8125_1";
-        //var rootName = "3001_1";
+        
+        /*var rootName = "multi_line";
         var jsonPath = "/InteractiveVisualizations/data/d3/specs/" + rootName + ".json";
         var csvPath = "/InteractiveVisualizations/data/d3/data/" + rootName + ".csv";
         var summaryPath = "/InteractiveVisualizations/data/d3/summaries/" + rootName + "_summary.json";
+        */
+
+        var rootName = "8";
+        var jsonPath = "/InteractiveVisualizations/data/kong/specs/" + rootName + ".json";
+        var csvPath = "/InteractiveVisualizations/data/kong/data/" + rootName + ".csv";
+        var summaryPath = "/InteractiveVisualizations/data/kong/summaries/" + rootName + "_summary.json";
 
         function run(summaryArray, trendsArray) {
             if (graphType == "line") {
