@@ -62,8 +62,8 @@
         var csvPath = "/InteractiveVisualizations/data/d3/data/" + rootName + ".csv";
         var summaryPath = "/InteractiveVisualizations/data/d3/summaries/" + rootName + "_summary.json";
         */
-
-        var rootName = "8";
+        
+        var rootName = "53";
         var jsonPath = "/InteractiveVisualizations/data/kong/specs/" + rootName + ".json";
         var csvPath = "/InteractiveVisualizations/data/kong/data/" + rootName + ".csv";
         var summaryPath = "/InteractiveVisualizations/data/kong/summaries/" + rootName + "_summary.json";
@@ -83,7 +83,6 @@
 
         function setSummary(summaryArray) {
             for (i = 0; i < summaryArray.length; i++) {
-                //console.log(summaryArray[i]);
                 var anchor = document.createElement("A");
                 id = "A" + i
                 anchor.setAttribute("id", id);
@@ -170,11 +169,6 @@
                 document.getElementById(minID).style.fill = '#3093cf';
             }
         }
-        //copy path
-        //clone node
-        //var res = str.split(",");
-        //var h = document.getElementById("myH2");
-        //h.insertAdjacentHTML("afterend", "<path>My new paragraph</path>");
 
         function addTextListener(id, i) {
             //add listener for summary anchor
@@ -221,6 +215,8 @@
             }
         }
         function setTitle(x, y, graph) {
+            console.log(x);
+            console.log(y);
             xAxis = x.replace(/_/g, " ");
             yAxis = y.replace(/_/g, " ");
             xLabel = x;
@@ -256,6 +252,7 @@
                 var jsonObj = metaRequest.response;
                 yAxis = jsonObj['encoding']["y"]["field"];
                 xAxis = jsonObj['encoding']["x"]["field"];
+                console.log(xAxis + " " + yAxis);
                 graphType = jsonObj['mark'];
                 setTitle(xAxis, yAxis, graphType);
             }
