@@ -57,9 +57,8 @@
         var xAxis = "";
         var yAxis = "";
 
-        var rootName = "3001_1";
-        //var rootName = "7920_0";
-        //var rootName = "2836_3";
+        var rootName = "8125_1";
+        //var rootName = "3001_1";
         var jsonPath = "/InteractiveVisualizations/data/d3/specs/" + rootName + ".json";
         var csvPath = "/InteractiveVisualizations/data/d3/data/" + rootName + ".csv";
         var summaryPath = "/InteractiveVisualizations/data/d3/summaries/" + rootName + "_summary.json";
@@ -219,6 +218,8 @@
         function setTitle(x, y, graph) {
             xAxis = x.replace(/_/g, " ");
             yAxis = y.replace(/_/g, " ");
+            xLabel = x;
+            yLabel = y;
             var title = graph + " graph of " + xAxis + " at " + yAxis;
             document.getElementById('title').innerText = title;
         }
@@ -241,38 +242,29 @@
         }
 
         function getMetaData() {
-            var requestURL = jsonPath;
-            var request = new XMLHttpRequest();
-            request.open('GET', requestURL);
-            request.responseType = 'json';
-            request.send();
-            request.onload = function () {
-                var jsonObj = request.response;
+            var metaRequestURL = jsonPath;
+            var metaRequest = new XMLHttpRequest();
+            metaRequest.open('GET', metaRequestURL);
+            metaRequest.responseType = 'json';
+            metaRequest.send();
+            metaRequest.onload = function () {
+                var jsonObj = metaRequest.response;
                 yAxis = jsonObj['encoding']["y"]["field"];
                 xAxis = jsonObj['encoding']["x"]["field"];
                 graphType = jsonObj['mark'];
                 setTitle(xAxis, yAxis, graphType);
             }
-            var requestURL1 = summaryPath;
-            var request1 = new XMLHttpRequest();
-            request1.open('GET', requestURL1);
-            request1.responseType = 'json';
-            request1.send();
-            request1.onload = function () {
-                var jsonObj = request1.response;
+            var summaryRequestURL = summaryPath;
+            var summaryRequest = new XMLHttpRequest();
+            summaryRequest.open('GET', summaryRequestURL);
+            summaryRequest.responseType = 'json';
+            summaryRequest.send();
+            summaryRequest.onload = function () {
+                var jsonObj = summaryRequest.response;
                 var summaryArray = jsonObj.summary;
                 var trendsArray = jsonObj.trends;
                 run(summaryArray, trendsArray);
             }
-        }
-
-        function getX(d) {
-            xAxisName = d3.keys(d)[0];
-            return xAxisName;
-        }
-        function getY(d) {
-            yAxisName = d3.keys(d)[1];
-            return yAxisName;
         }
     </script>
 
@@ -300,15 +292,15 @@
                 //Read the data
                 d3.csv(csvPath).then(function (data) {
                     var x = d3.scaleBand()
-                        .domain(data.map(function (d) { return d[getX(d)]; }))
+                        .domain(data.map(function (d) { return d[xLabel]; }))
                         .range([0, width])
-                        .padding(0);
+                        .padding(.1);
                     svg.append("g")
                         .attr("transform", "translate(0," + height + ")")
                         .call(d3.axisBottom(x));
                     // Add Y axis
                     var y = d3.scaleLinear()
-                        .domain([0, d3.max(data, function (d) { return +d[getY(d)]; })])
+                        .domain([0, d3.max(data, function (d) { return +d[yLabel]; })])
                         .range([height, 0]);
                     svg.append("g")
                         .call(d3.axisLeft(y));
@@ -316,7 +308,7 @@
                         .attr('class', 'd3-tip')
                         .offset([-10, 0])
                         .html(function (d) {
-                            return "<strong> " + yAxis + ":</strong> <span style='color:red'>" + d[getY(d)] + "</span>";
+                            return "<strong> " + yAxis + ":</strong> <span style='color:red'>" + d[yLabel] + "</span>";
                         })
                     svg.call(tip);
                     // Add the line
@@ -327,30 +319,30 @@
                         .attr("stroke", "steelblue")
                         .attr("stroke-width", 1.5)
                         .attr("d", d3.line()
-                            .x(function (d) { return x(d[getX(d)]) })
-                            .y(function (d) { return y(d[getY(d)]) })
+                            .x(function (d) { return x(d[xLabel]) })
+                            .y(function (d) { return y(d[yLabel]) })
                         );
 
                     svg.selectAll(".dot")
                         .data(data)
                         .enter().append("circle")
                         .attr("class", "dot") // Assign a class for styling
-                        .attr("xVal", function (d) { return d[getX(d)] })
-                        .attr("yVal", function (d) { return d[getY(d)] })
-                        .attr("cx", function (d) { return x(d[getX(d)]) })
-                        .attr("cy", function (d) { return y(d[getY(d)]) })
+                        .attr("xVal", function (d) { return d[xLabel] })
+                        .attr("yVal", function (d) { return d[yLabel] })
+                        .attr("cx", function (d) { return x(d[xLabel]) })
+                        .attr("cy", function (d) { return y(d[yLabel]) })
                         .attr("r", 5)
                         .attr("fill", "grey")
                         .each(setId)
                         .on('mouseover', function (d) {
                             id = this.getAttribute("id")
                             lineListenerOver(id)
-                            tip.show
+                            tip.show(d)
                         })
                         .on('mouseout', function (d) {
                             id = this.getAttribute("id")
                             lineListenerOut(id)
-                            tip.show
+                            tip.hide(d)
                         })
                 });
             }
@@ -362,16 +354,16 @@
 
                 var x = d3.scaleBand()
                     .rangeRound([0, width])
-                    .padding(0);
+                    .padding(.3);
 
                 var y = d3.scaleLinear()
                     .rangeRound([height, 0]);
 
-                var tip = d3.tip()
+                tip = d3.tip()
                     .attr('class', 'd3-tip')
                     .offset([-10, 0])
                     .html(function (d) {
-                        return "<strong> " + getY(d) + ":</strong> <span style='color:red'>" + d[getY(d)] + "</span>";
+                        return "<strong> " + yAxis + ":</strong> <span style='color:red'>" + d[yLabel] + "</span>";
                     })
 
                 var svg = d3.select("#chart").append("svg")
@@ -384,10 +376,10 @@
 
                 d3.csv(csvPath).then(function (data) {
                     x.domain(data.map(function (d) {
-                        return d[getX(d)];
+                        return d[xLabel];
                     }));
                     y.domain([0, d3.max(data, function (d) {
-                        return d3.format(".1e")(d[getY(d)]);
+                        return d3.format(".1e")(d[yLabel]);
                     })]);
                     svg.append("g")
                         .attr("transform", "translate(0," + height + ")")
@@ -406,28 +398,28 @@
                         .enter().append("rect")
                         .attr("class", "bar")
                         .attr("x", function (d) {
-                            return x(d[getX(d)]);
+                            return x(d[xLabel]);
                         })
                         .attr("width", x.bandwidth())
                         .attr("y", function (d) {
-                            return y(d[getY(d)]);
+                            return y(d[yLabel]);
                         })
                         .attr("height", function (d) {
-                            return height - y(d[getY(d)]);
+                            return height - y(d[yLabel]);
                         })
-                        .attr("xVal", function (d) { return d[getX(d)] })
-                        .attr("yVal", function (d) { return d[getY(d)] })
+                        .attr("xVal", function (d) { return d[xLabel] })
+                        .attr("yVal", function (d) { return d[yLabel] })
                         .each(setId)
                         .attr("fill", "#3093cf")
                         .on('mouseover', function (d) {
                             id = this.getAttribute("id")
                             barListenerOver(id)
-                            tip.show
+                            tip.show(d)
                         })
                         .on('mouseout', function (d) {
                             id = this.getAttribute("id")
                             barListenerOut(id)
-                            tip.show
+                            tip.hide(d)
                         });
                 });
             }

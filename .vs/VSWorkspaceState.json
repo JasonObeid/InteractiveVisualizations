@@ -2,8 +2,10 @@
   "ExpandedNodes": [
     "",
     "\\data",
-    "\\data\\d3"
+    "\\data\\d3",
+    "\\data\\d3\\specs",
+    "\\demo"
   ],
-  "SelectedNode": "\\Interactive Graph.html",
+  "SelectedNode": "\\aws-sdk.min.js",
   "PreviewInSolutionExplorer": false
 }
