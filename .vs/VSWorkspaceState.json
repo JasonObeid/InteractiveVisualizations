@@ -3,9 +3,12 @@
     "",
     "\\data",
     "\\data\\d3",
-    "\\data\\d3\\specs",
-    "\\demo"
+    "\\data\\d3\\summaries",
+    "\\data\\kong",
+    "\\data\\kong\\data",
+    "\\data\\kong\\specs",
+    "\\data\\kong\\summaries"
   ],
-  "SelectedNode": "\\aws-sdk.min.js",
+  "SelectedNode": "\\data\\d3\\summaries\\3001_1_summary.json",
   "PreviewInSolutionExplorer": false
 }
