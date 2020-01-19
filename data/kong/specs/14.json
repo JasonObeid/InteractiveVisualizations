@@ -1,1 +1,0 @@
-{"$schema": "https://vega.github.io/schema/vega-lite/v3.0.0-rc4.json", "encoding": {"y": {"field": "Region", "type": "nominal"}, "color": {"field": "Trade provision", "type": "nominal"}, "x": {"field": "average score of agreements", "type": "quantitative"}}, "data": {"url": "data/kong/data/14.csv"}, "mark": "bar"}

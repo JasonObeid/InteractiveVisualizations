@@ -7,9 +7,11 @@
     .x.axis path {
         display: none;
     }
-    a.outline{
+
+    a.outline {
         text-shadow: 0.5px 1px #ffcea6;
     }
+
     .d3-tip {
         line-height: 1;
         font-weight: bold;
@@ -57,13 +59,19 @@
         var xAxis = "";
         var yAxis = "";
 
-        //var rootName = "7920_0";
         var rootName = "3001_1";
         var jsonPath = "/InteractiveVisualizations/data/d3/specs/" + rootName + ".json";
         var csvPath = "/InteractiveVisualizations/data/d3/data/" + rootName + ".csv";
         var summaryPath = "/InteractiveVisualizations/data/d3/summaries/" + rootName + "_summary.json";
 
+
+        /*var rootName = "53";
+        var jsonPath = "/InteractiveVisualizations/data/kong/specs/" + rootName + ".json";
+        var csvPath = "/InteractiveVisualizations/data/kong/data/" + rootName + ".csv";
+        var summaryPath = "/InteractiveVisualizations/data/kong/summaries/" + rootName + "_summary.json";*/
+
         function run(summaryArray, trendsArray) {
+            sumArrayLength = summaryArray.length;
             if (graphType == "line") {
                 idArray = setGraphs(trendsArray);
                 lineGraph();
@@ -76,9 +84,56 @@
             }
         }
 
+        function getMetaData() {
+            var metaRequestURL = jsonPath;
+            var metaRequest = new XMLHttpRequest();
+            metaRequest.open('GET', metaRequestURL);
+            metaRequest.responseType = 'json';
+            metaRequest.send();
+            metaRequest.onload = function () {
+                var jsonObj = metaRequest.response;
+                yAxis = jsonObj['encoding']["y"]["field"];
+                xAxis = jsonObj['encoding']["x"]["field"];
+                graphType = jsonObj['mark'];
+                setTitle(xAxis, yAxis, graphType);
+            }
+            var summaryRequestURL = summaryPath;
+            var summaryRequest = new XMLHttpRequest();
+            summaryRequest.open('GET', summaryRequestURL);
+            summaryRequest.responseType = 'json';
+            summaryRequest.send();
+            summaryRequest.onload = function () {
+                var jsonObj = summaryRequest.response;
+                var summaryArray = jsonObj.summary;
+                var trendsArray = jsonObj.trends;
+                run(summaryArray, trendsArray);
+            }
+        }
+
+        function setTitle(x, y, graph) {
+            xAxis = x.replace(/_/g, " ");
+            yAxis = y.replace(/_/g, " ");
+            xLabel = x;
+            yLabel = y;
+            var title = graph + " graph of " + xAxis + " at " + yAxis;
+            document.getElementById('title').innerText = title;
+        }
+
+        var count = 0;
+        function setId() {
+            var id = ("Column" + count)
+            d3.select(this).attr("id", id);
+            xValue = d3.select(this).attr("xVal");
+            yValue = d3.select(this).attr("yVal");
+            var string = yAxis + " is " + yValue + " at " + xAxis + " " + xValue;
+            document.getElementById(id).addEventListener("mouseover", function () {
+                textChange(string);
+            });
+            count = count + 1;
+        }
+
         function setSummary(summaryArray) {
             for (i = 0; i < summaryArray.length; i++) {
-                //console.log(summaryArray[i]);
                 var anchor = document.createElement("A");
                 id = "A" + i
                 anchor.setAttribute("id", id);
@@ -90,6 +145,7 @@
                 }
             }
         }
+
         function setGraphs(trendsArray) {
             var idArray = [];
             for (n = 0; n < trendsArray.length; n++) {
@@ -115,6 +171,7 @@
             idArray.push(ids);
             return idArray;
         }
+
         function lineListenerOver(id) {
             for (var k = 0; k < idArray.length; k++) {
                 if (idArray[k].includes(id)) {
@@ -126,6 +183,7 @@
                 }
             }
         }
+
         function lineListenerOut(id) {
             for (var j = 0; j < idArray.length; j++) {
                 if (idArray[j].includes(id)) {
@@ -137,6 +195,7 @@
                 }
             }
         }
+
         function barListenerOver(id) {
             maxID = idArray[0][1];
             minID = idArray[0][0];
@@ -151,6 +210,7 @@
                 document.getElementById(minID).style.fill = '#cf6830';
             }
         }
+
         function barListenerOut(id) {
             maxID = idArray[0][1];
             minID = idArray[0][0];
@@ -165,11 +225,6 @@
                 document.getElementById(minID).style.fill = '#3093cf';
             }
         }
-        //copy path
-        //clone node
-        //var res = str.split(",");
-        //var h = document.getElementById("myH2");
-        //h.insertAdjacentHTML("afterend", "<path>My new paragraph</path>");
 
         function addTextListener(id, i) {
             //add listener for summary anchor
@@ -215,57 +270,37 @@
                 });
             }
         }
-        function setTitle(x, y, graph) {
-            xAxis = x.replace(/_/g, " ");
-            yAxis = y.replace(/_/g, " ");
-            xLabel = x;
-            yLabel = y;
-            var title = graph + " graph of " + xAxis + " at " + yAxis;
-            document.getElementById('title').innerText = title;
-        }
-        var count = 0;
-        function setId() {
-            var id = ("Column" + count)
-            d3.select(this).attr("id", id);
-            xValue = d3.select(this).attr("xVal");
-            yValue = d3.select(this).attr("yVal");
-            var string = yAxis + " is " + yValue + " at " + xAxis + " " + xValue;
-            document.getElementById(id).addEventListener("mouseover", function () {
-                textChange(string);
-            });
-            count = count + 1;
-        }
 
         function textChange(text) {
             document.getElementById("summaryText").innerText = text;
             speakText(text);
         }
 
-        function getMetaData() {
-            var metaRequestURL = jsonPath;
-            var metaRequest = new XMLHttpRequest();
-            metaRequest.open('GET', metaRequestURL);
-            metaRequest.responseType = 'json';
-            metaRequest.send();
-            metaRequest.onload = function () {
-                var jsonObj = metaRequest.response;
-                yAxis = jsonObj['encoding']["y"]["field"];
-                xAxis = jsonObj['encoding']["x"]["field"];
-                graphType = jsonObj['mark'];
-                setTitle(xAxis, yAxis, graphType);
-            }
-            var summaryRequestURL = summaryPath;
-            var summaryRequest = new XMLHttpRequest();
-            summaryRequest.open('GET', summaryRequestURL);
-            summaryRequest.responseType = 'json';
-            summaryRequest.send();
-            summaryRequest.onload = function () {
-                var jsonObj = summaryRequest.response;
-                var summaryArray = jsonObj.summary;
-                var trendsArray = jsonObj.trends;
-                run(summaryArray, trendsArray);
-            }
+        function narrateSummary() {
+            var audioPlayer = document.getElementById("audioPlayback");
+            var play = 0;
+            var txtID = "A0";
+            var text = document.getElementById(txtID).innerText;
+            speakText(text);
+            document.getElementById(txtID).style.backgroundColor = '#d9f6ff';
+            var handler = function() {
+                play = play + 1;
+                if (play < sumArrayLength) {
+                    txtIdN = "A" + play;
+                    txtIdM = "A" + (play - 1);
+                    var text = document.getElementById(txtIdN).innerText;
+                    speakText(text);
+                    document.getElementById(txtIdM).style.backgroundColor = 'transparent';
+                    document.getElementById(txtIdN).style.backgroundColor = '#d9f6ff';
+                }
+                else if (play == sumArrayLength) {
+                    document.getElementById(txtIdN).style.backgroundColor = 'transparent';
+                    audioPlayer.removeEventListener("ended", handler);
+                }
+            };
+            audioPlayer.addEventListener("ended", handler);
         }
+
     </script>
 
     <section id="graph">
@@ -467,6 +502,7 @@
         <tr id="chart" colspan="2"></tr>
         <tr>
             <td><p id="summary"></p></td>
+            <button onclick="narrateSummary()">Narrate Summary</button>
         </tr>
         <tr>
             <td>
