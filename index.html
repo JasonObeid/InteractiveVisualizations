@@ -70,20 +70,6 @@
         var csvPath = "/InteractiveVisualizations/data/kong/data/" + rootName + ".csv";
         var summaryPath = "/InteractiveVisualizations/data/kong/summaries/" + rootName + "_summary.json";*/
 
-        function run(summaryArray, trendsArray) {
-            sumArrayLength = summaryArray.length;
-            if (graphType == "line") {
-                idArray = setGraphs(trendsArray);
-                lineGraph();
-                setSummary(summaryArray);
-            }
-            else if (graphType == "bar") {
-                idArray = setBarGraphs(trendsArray);
-                barGraph();
-                setSummary(summaryArray);
-            }
-        }
-
         function getMetaData() {
             var metaRequestURL = jsonPath;
             var metaRequest = new XMLHttpRequest();
@@ -110,13 +96,18 @@
             }
         }
 
-        function setTitle(x, y, graph) {
-            xAxis = x.replace(/_/g, " ");
-            yAxis = y.replace(/_/g, " ");
-            xLabel = x;
-            yLabel = y;
-            var title = graph + " graph of " + xAxis + " at " + yAxis;
-            document.getElementById('title').innerText = title;
+        function run(summaryArray, trendsArray) {
+            sumArrayLength = summaryArray.length;
+            if (graphType == "line") {
+                idArray = setGraphs(trendsArray);
+                lineGraph();
+                setSummary(summaryArray);
+            }
+            else if (graphType == "bar") {
+                idArray = setBarGraphs(trendsArray);
+                barGraph();
+                setSummary(summaryArray);
+            }
         }
 
         var count = 0;
@@ -130,6 +121,15 @@
                 textChange(string);
             });
             count = count + 1;
+        }
+
+        function setTitle(x, y, graph) {
+            xAxis = x.replace(/_/g, " ");
+            yAxis = y.replace(/_/g, " ");
+            xLabel = x;
+            yLabel = y;
+            var title = graph + " graph of " + xAxis + " at " + yAxis;
+            document.getElementById('title').innerText = title;
         }
 
         function setSummary(summaryArray) {
@@ -283,7 +283,7 @@
             var text = document.getElementById(txtID).innerText;
             speakText(text);
             document.getElementById(txtID).style.backgroundColor = '#d9f6ff';
-            var handler = function() {
+            var handler = function () {
                 play = play + 1;
                 if (play < sumArrayLength) {
                     txtIdN = "A" + play;
