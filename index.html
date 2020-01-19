@@ -52,14 +52,11 @@
 <html>
 
 <head>
-</head>
-
-<body>
     <script>
         var xAxis = "";
         var yAxis = "";
 
-        var rootName = "3001_1";
+        var rootName = "7920_0";
         var jsonPath = "/InteractiveVisualizations/data/d3/specs/" + rootName + ".json";
         var csvPath = "/InteractiveVisualizations/data/d3/data/" + rootName + ".csv";
         var summaryPath = "/InteractiveVisualizations/data/d3/summaries/" + rootName + "_summary.json";
@@ -70,6 +67,7 @@
         var csvPath = "/InteractiveVisualizations/data/kong/data/" + rootName + ".csv";
         var summaryPath = "/InteractiveVisualizations/data/kong/summaries/" + rootName + "_summary.json";*/
 
+        var graphType = "";
         function getMetaData() {
             var metaRequestURL = jsonPath;
             var metaRequest = new XMLHttpRequest();
@@ -80,7 +78,8 @@
                 var jsonObj = metaRequest.response;
                 yAxis = jsonObj['encoding']["y"]["field"];
                 xAxis = jsonObj['encoding']["x"]["field"];
-                graphType = jsonObj['mark'];
+                graphType = jsonObj.mark;
+                console.log(graphType);
                 setTitle(xAxis, yAxis, graphType);
             }
             var summaryRequestURL = summaryPath;
@@ -97,6 +96,7 @@
         }
 
         function run(summaryArray, trendsArray) {
+            console.log(graphType);
             sumArrayLength = summaryArray.length;
             if (graphType == "line") {
                 idArray = setGraphs(trendsArray);
@@ -124,6 +124,7 @@
         }
 
         function setTitle(x, y, graph) {
+            console.log(graph);
             xAxis = x.replace(/_/g, " ");
             yAxis = y.replace(/_/g, " ");
             xLabel = x;
@@ -277,6 +278,10 @@
         }
 
         function narrateSummary() {
+            //console.log(idArray);
+            //maxID = idArray[0][1];
+            //minID = idArray[0][0];
+            //console.log(maxID + " " + minID);
             var audioPlayer = document.getElementById("audioPlayback");
             var play = 0;
             var txtID = "A0";
@@ -302,9 +307,10 @@
         }
 
     </script>
+</head>
 
+<body>
     <section id="graph">
-
         <!--Bar graph with-->
         <script src="https://d3js.org/d3.v5.min.js"></script>
         <script src="d3-tip.js"></script>
@@ -459,7 +465,6 @@
                 });
             }
         </script>
-
         <!--Text to speech-->
         <script src="https://sdk.amazonaws.com/js/aws-sdk-2.529.0.min.js"></script>
         <script type="text/javascript">
@@ -502,7 +507,11 @@
         <tr id="chart" colspan="2"></tr>
         <tr>
             <td><p id="summary"></p></td>
-            <button onclick="narrateSummary()">Narrate Summary</button>
+        </tr>
+        <tr>
+            <td>
+                <button onclick="narrateSummary()">Narrate Summary</button>
+            </td>
         </tr>
         <tr>
             <td>
