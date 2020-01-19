@@ -1,1 +1,1 @@
-{"summary": ["This bar chart has 2 categories for the nominal data of gender.", " The highest value is found at male with a value of 247000.", " The lowest value is found at female with a value of 140600."], "trends": {"maxIndex": 1, "minIndex": 0}}
+{"summary": ["This bar chart has 2 categories for the x axis representing gender, and 2 categories for the y axis representing value.", " The highest value is found at male with a value of 247000.", " The lowest value is found at female with a value of 140600."], "trends": {"maxIndex": 1, "minIndex": 0}}

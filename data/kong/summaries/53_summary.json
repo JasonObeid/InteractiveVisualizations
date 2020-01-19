@@ -1,1 +1,1 @@
-{"summary": ["This bar chart has 3 categories for the nominal data of race.", " The highest value is found at White with a percent of 44.", " The lowest value is found at Latino with a percent of 23."], "trends": {"maxIndex": 0, "minIndex": 2}}
+{"summary": ["This bar chart has 3 categories for the x axis representing race, and 3 categories for the y axis representing percent.", " The highest value is found at White with a percent of 44.", " The lowest value is found at Latino with a percent of 23."], "trends": {"maxIndex": 0, "minIndex": 2}}
