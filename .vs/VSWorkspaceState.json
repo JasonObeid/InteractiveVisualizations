@@ -3,12 +3,14 @@
     "",
     "\\data",
     "\\data\\d3",
+    "\\data\\d3\\data",
+    "\\data\\d3\\specs",
     "\\data\\d3\\summaries",
     "\\data\\kong",
     "\\data\\kong\\data",
     "\\data\\kong\\specs",
     "\\data\\kong\\summaries"
   ],
-  "SelectedNode": "\\data\\d3\\summaries\\3001_1_summary.json",
+  "SelectedNode": "\\data\\d3\\summaries\\3001_0_summary.json",
   "PreviewInSolutionExplorer": false
 }

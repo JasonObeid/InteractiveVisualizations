@@ -56,7 +56,7 @@
         var xAxis = "";
         var yAxis = "";
 
-        var rootName = "7920_0";
+        var rootName = "3001_1";
         var jsonPath = "/InteractiveVisualizations/data/d3/specs/" + rootName + ".json";
         var csvPath = "/InteractiveVisualizations/data/d3/data/" + rootName + ".csv";
         var summaryPath = "/InteractiveVisualizations/data/d3/summaries/" + rootName + "_summary.json";
@@ -319,7 +319,7 @@
             function lineGraph() {
                 var margin = { top: 10, right: 30, bottom: 30, left: 60 },
                     width = 960 - margin.left - margin.right,
-                    height = 540 - margin.top - margin.bottom;
+                    height = 600 - margin.top - margin.bottom;
 
                 // append the svg object to the body of the page
                 var svg = d3.select("#chart")
@@ -385,6 +385,20 @@
                             lineListenerOut(id)
                             tip.hide(d)
                         })
+
+                    svg.append("text")
+                        .attr("transform",
+                            "translate(" + (width / 2) + " ," +
+                            (height + margin.top + 25) + ")")
+                        .style("text-anchor", "middle")
+                        .text(xAxis);
+
+                    svg.append("text")
+                        .attr("transform", "rotate(-90)")
+                        .attr("y", 0 - margin.left)
+                        .attr("x", 0 - (height / 2))
+                        .attr("dy", "1em")
+                        .text(yAxis);
                 });
             }
 
@@ -463,6 +477,20 @@
                             tip.hide(d)
                         });
                 });
+
+                svg.append("text")
+                    .attr("transform",
+                        "translate(" + (width / 2) + " ," +
+                        (height + margin.top + 25) + ")")
+                    .style("text-anchor", "middle")
+                    .text(xAxis);
+
+                svg.append("text")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", 0 - margin.left)
+                    .attr("x", 0 - (height / 2))
+                    .attr("dy", "1em")
+                    .text(yAxis);
             }
         </script>
         <!--Text to speech-->
