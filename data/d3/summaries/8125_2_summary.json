@@ -1,1 +1,1 @@
-{"summary": ["This bar chart has 20 categories for the nominal data of country.", " The highest value is found at NLD with a rating of 76.", " The lowest value is found at PRT with a rating of 0."], "trends": {"maxIndex": 8, "minIndex": 19}}
+{"summary": ["This bar chart has 20 categories for the x axis representing country, and 20 categories for the y axis representing rating.", " The highest value is found at NLD with a rating of 76.", " The lowest value is found at PRT with a rating of 0."], "trends": {"maxIndex": 8, "minIndex": 19}}
