@@ -4,7 +4,12 @@
         font: 14px helvetica;
     }
     text.label {
-        font: 16px helvetica;
+        font: 20px helvetica;
+        font-weight: bold;
+
+    }
+    text {
+        font: 18px helvetica;
     }
     .x.axis path {
         display: none;
@@ -101,7 +106,7 @@
         var xAxis = "";
         var yAxis = "";
 
-        var rootName = "7920_0";
+        var rootName = "3001_0";
         var jsonPath = "/InteractiveVisualizations/data/d3/specs/" + rootName + ".json";
         var csvPath = "/InteractiveVisualizations/data/d3/data/" + rootName + ".csv";
         var summaryPath = "/InteractiveVisualizations/data/d3/summaries/" + rootName + "_summary.json";
@@ -124,7 +129,6 @@
                 yAxis = jsonObj['encoding']["y"]["field"];
                 xAxis = jsonObj['encoding']["x"]["field"];
                 graphType = jsonObj.mark;
-                console.log(graphType);
                 setTitle(xAxis, yAxis, graphType);
             }
             var summaryRequestURL = summaryPath;
@@ -141,7 +145,6 @@
         }
 
         function run(summaryArray, trendsArray) {
-            console.log(graphType);
             sumArrayLength = summaryArray.length;
             if (graphType == "line") {
                 idArray = setGraphs(trendsArray);
@@ -169,7 +172,6 @@
         }
 
         function setTitle(x, y, graph) {
-            console.log(graph);
             xAxis = x.replace(/_/g, " ");
             yAxis = y.replace(/_/g, " ");
             xLabel = x;
@@ -323,10 +325,6 @@
         }
 
         function narrateSummary() {
-            //console.log(idArray);
-            //maxID = idArray[0][1];
-            //minID = idArray[0][0];
-            //console.log(maxID + " " + minID);
             var audioPlayer = document.getElementById("audioPlayback");
             var play = 0;
             var txtID = "A0";
