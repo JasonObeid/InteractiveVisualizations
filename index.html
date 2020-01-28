@@ -1,9 +1,16 @@
 <style>
 
     body {
-        font: 10px sans-serif;
+        font: 14px helvetica;
     }
+    text.label {
+        font: 20px helvetica;
+        font-weight: bold;
 
+    }
+    text {
+        font: 18px helvetica;
+    }
     .x.axis path {
         display: none;
     }
@@ -41,12 +48,55 @@
 
     table {
         text-align: center;
+        font: 18px helvetica;
     }
 
     #title {
         font: 32px helvetica;
         text-align: center;
     }
+
+    .button {
+        display: inline-block;
+        border-radius: 8px;
+        background-color: lightblue;
+        border: none;
+        color: black;
+        text-align: center;
+        font-size: 18px;
+        padding: 12px;
+        width: 30%;
+        vertical-align: central;
+        text-align: center;
+        transition: all 0.5s;
+        cursor: pointer;
+        margin: 5px;
+    }
+
+        .button span {
+            cursor: pointer;
+            display: inline-block;
+            position: relative;
+            transition: 0.5s;
+        }
+
+            .button span:after {
+                content: '\00bb';
+                position: absolute;
+                opacity: 0;
+                top: 0;
+                right: -20px;
+                transition: 0.5s;
+            }
+
+        .button:hover span {
+            padding-right: 25px;
+        }
+
+            .button:hover span:after {
+                opacity: 1;
+                right: 0;
+            }
 </style>
 
 <html>
@@ -56,7 +106,7 @@
         var xAxis = "";
         var yAxis = "";
 
-        var rootName = "3001_1";
+        var rootName = "3001_0";
         var jsonPath = "/InteractiveVisualizations/data/d3/specs/" + rootName + ".json";
         var csvPath = "/InteractiveVisualizations/data/d3/data/" + rootName + ".csv";
         var summaryPath = "/InteractiveVisualizations/data/d3/summaries/" + rootName + "_summary.json";
@@ -79,7 +129,6 @@
                 yAxis = jsonObj['encoding']["y"]["field"];
                 xAxis = jsonObj['encoding']["x"]["field"];
                 graphType = jsonObj.mark;
-                console.log(graphType);
                 setTitle(xAxis, yAxis, graphType);
             }
             var summaryRequestURL = summaryPath;
@@ -96,7 +145,6 @@
         }
 
         function run(summaryArray, trendsArray) {
-            console.log(graphType);
             sumArrayLength = summaryArray.length;
             if (graphType == "line") {
                 idArray = setGraphs(trendsArray);
@@ -124,7 +172,6 @@
         }
 
         function setTitle(x, y, graph) {
-            console.log(graph);
             xAxis = x.replace(/_/g, " ");
             yAxis = y.replace(/_/g, " ");
             xLabel = x;
@@ -278,10 +325,6 @@
         }
 
         function narrateSummary() {
-            //console.log(idArray);
-            //maxID = idArray[0][1];
-            //minID = idArray[0][0];
-            //console.log(maxID + " " + minID);
             var audioPlayer = document.getElementById("audioPlayback");
             var play = 0;
             var txtID = "A0";
@@ -317,7 +360,7 @@
         <script>
             getMetaData();
             function lineGraph() {
-                var margin = { top: 10, right: 30, bottom: 30, left: 60 },
+                var margin = { top: 30, right: 30, bottom: 50, left: 60 },
                     width = 960 - margin.left - margin.right,
                     height = 600 - margin.top - margin.bottom;
 
@@ -389,21 +432,23 @@
                     svg.append("text")
                         .attr("transform",
                             "translate(" + (width / 2) + " ," +
-                            (height + margin.top + 25) + ")")
+                        (height + margin.top + 10) + ")")
+                        .attr("class", "label")
                         .style("text-anchor", "middle")
                         .text(xAxis);
 
                     svg.append("text")
                         .attr("transform", "rotate(-90)")
                         .attr("y", 0 - margin.left)
-                        .attr("x", 0 - (height / 2))
+                        .attr("x", 0 - (height / 2) - (margin.top + margin.bottom))
                         .attr("dy", "1em")
+                        .attr("class", "label")
                         .text(yAxis);
                 });
             }
 
             function barGraph() {
-                var margin = { top: 40, right: 80, bottom: 30, left: 90 },
+                var margin = { top: 30, right: 30, bottom: 50, left: 60 },
                     width = 960 - margin.left - margin.right,
                     height = 600 - margin.top - margin.bottom;
 
@@ -481,15 +526,17 @@
                 svg.append("text")
                     .attr("transform",
                         "translate(" + (width / 2) + " ," +
-                        (height + margin.top + 25) + ")")
+                        (height + margin.top + 10) + ")")
+                    .attr("class", "label")
                     .style("text-anchor", "middle")
                     .text(xAxis);
 
                 svg.append("text")
                     .attr("transform", "rotate(-90)")
                     .attr("y", 0 - margin.left)
-                    .attr("x", 0 - (height / 2))
+                    .attr("x", 0 - (height / 2) - (margin.top + margin.bottom))
                     .attr("dy", "1em")
+                    .attr("class", "label")
                     .text(yAxis);
             }
         </script>
@@ -530,7 +577,7 @@
             <td colspan="2"><h1 id="title"></h1></td>
         </tr>
         <tr>
-            <td><h3 id="summaryText">Hover over a bar to hear its caption</h3></td>
+            <td><h3 id="summaryText">Hover over a point of data to hear its caption</h3></td>
         </tr>
         <tr id="chart" colspan="2"></tr>
         <tr>
@@ -538,7 +585,7 @@
         </tr>
         <tr>
             <td>
-                <button onclick="narrateSummary()">Narrate Summary</button>
+                <button class="button" onclick="narrateSummary()">Narrate Summary</button>
             </td>
         </tr>
         <tr>
