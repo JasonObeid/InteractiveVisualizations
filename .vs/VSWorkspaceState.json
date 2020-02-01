@@ -4,11 +4,8 @@
     "\\data",
     "\\data\\d3",
     "\\data\\d3\\summaries",
-    "\\data\\kong",
-    "\\data\\kong\\data",
-    "\\data\\kong\\specs",
-    "\\data\\kong\\summaries"
+    "\\data\\kong"
   ],
-  "SelectedNode": "\\index.html",
+  "SelectedNode": "\\data\\kong",
   "PreviewInSolutionExplorer": false
 }
