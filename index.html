@@ -108,7 +108,7 @@
         var xAxis = "";
         var yAxis = "";
 
-        var rootName = "3001_0";
+        var rootName = "7920_0";
         var jsonPath = "/InteractiveVisualizations/data/d3/specs/" + rootName + ".json";
         var csvPath = "/InteractiveVisualizations/data/d3/data/" + rootName + ".csv";
         var summaryPath = "/InteractiveVisualizations/data/d3/summaries/" + rootName + "_summary.json";
@@ -247,8 +247,8 @@
         }
 
         function barListenerOver(id) {
-            maxID = idArray[0][1];
-            minID = idArray[0][0];
+            var maxID = idArray[0][1];
+            var minID = idArray[0][0];
             if (id == maxID) {
                 var textid = "A1"
                 document.getElementById(textid).style.backgroundColor = '#d9f6ff';
@@ -262,8 +262,8 @@
         }
 
         function barListenerOut(id) {
-            maxID = idArray[0][1];
-            minID = idArray[0][0];
+            var maxID = idArray[0][1];
+            var minID = idArray[0][0];
             if (id == maxID) {
                 var textid = "A1"
                 document.getElementById(textid).style.backgroundColor = 'transparent';
@@ -279,8 +279,8 @@
         function addTextListener(id, i) {
             //add listener for summary anchor
             if (graphType == "bar") {
-                maxID = idArray[0][1];
-                minID = idArray[0][0];
+                var maxID = idArray[0][1];
+                var minID = idArray[0][0];
                 if (id == "A1") {
                     document.getElementById(id).addEventListener("mouseover", function () {
                         document.getElementById(id).style.backgroundColor = '#d9f6ff';
@@ -327,6 +327,7 @@
         }
 
         function narrateSummary() {
+            //executes on press of narrate summary button
             var audioPlayer = document.getElementById("audioPlayback");
             var playCount = 0;
             var txtID = "A0";
@@ -343,8 +344,8 @@
                     var graphIdsM = idArray[playCount - 2];
                     if (trendCount > 1) {
                         if (playCount < sumArrayLength) {
-                            txtIdN = "A" + playCount;
-                            txtIdM = "A" + (playCount - 1);
+                            var txtIdN = "A" + playCount;
+                            var txtIdM = "A" + (playCount - 1);
                             var text = document.getElementById(txtIdN).innerText;
                             speakText(text);
                             document.getElementById(txtIdM).style.backgroundColor = 'transparent';
@@ -375,8 +376,8 @@
                     //uni-trend lines
                     else {
                         if (playCount < sumArrayLength) {
-                            txtIdN = "A" + playCount;
-                            txtIdM = "A" + (playCount - 1);
+                            var txtIdN = "A" + playCount;
+                            var txtIdM = "A" + (playCount - 1);
                             var text = document.getElementById(txtIdN).innerText;
                             speakText(text);
                             document.getElementById(txtIdM).style.backgroundColor = 'transparent';
@@ -399,6 +400,28 @@
                 }
                 //bar graphs
                 else if (graphType == "bar") {
+                    var maxID = idArray[0][1];
+                    var minID = idArray[0][0];
+                    if (playCount < sumArrayLength) {
+                        var txtIdN = "A" + playCount;
+                        var txtIdM = "A" + (playCount - 1);
+                        var text = document.getElementById(txtIdN).innerText;
+                        speakText(text);
+                        document.getElementById(txtIdM).style.backgroundColor = 'transparent';
+                        document.getElementById(txtIdN).style.backgroundColor = '#d9f6ff';
+                        if (playCount == 1) {
+                            document.getElementById(maxID).style.fill = '#cf6830';
+                        }
+                        else if (playCount == 2) {
+                            document.getElementById(minID).style.fill = '#cf6830';
+                            document.getElementById(maxID).style.fill = '#3093cf';
+                        }
+                    }
+                    else if (playCount == sumArrayLength) {
+                        document.getElementById("A2").style.backgroundColor = 'transparent';
+                        audioPlayer.removeEventListener("ended", handler);
+                        document.getElementById(minID).style.fill = '#3093cf';
+                    }
                 }
             };
             audioPlayer.addEventListener("ended", handler);
@@ -626,14 +649,14 @@
             }
         </script>
     </section>
-    <table width="50%" cellpadding="5">
+    <table align="center" width="60%" cellpadding="5">
         <tr>
-            <td colspan="2"><h1 id="title"></h1></td>
+            <td><h1 id="title"></h1></td>
         </tr>
         <tr>
             <td><h3 id="summaryText">Hover over a point of data to hear its caption</h3></td>
         </tr>
-        <tr id="chart" colspan="2"></tr>
+        <tr id="chart"></tr>
         <tr>
             <td><p id="summary"></p></td>
         </tr>
