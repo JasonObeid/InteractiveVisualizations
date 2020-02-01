@@ -336,72 +336,72 @@
             speakText(text);
             document.getElementById(txtID).style.backgroundColor = '#d9f6ff';
             var handler = function () {
+                playCount = playCount + 1;
                 if (graphType == "line") {
-                    lineNarration(playCount+1, trendCount);
+                    //multi-trend lines
+                    var graphIdsN = idArray[playCount - 1];
+                    var graphIdsM = idArray[playCount - 2];
+                    if (trendCount > 1) {
+                        if (playCount < sumArrayLength) {
+                            txtIdN = "A" + playCount;
+                            txtIdM = "A" + (playCount - 1);
+                            var text = document.getElementById(txtIdN).innerText;
+                            speakText(text);
+                            document.getElementById(txtIdM).style.backgroundColor = 'transparent';
+                            document.getElementById(txtIdN).style.backgroundColor = '#d9f6ff';
+                            if (playCount == 1) {
+                                for (var n = 0; n < graphIdsN.length; n++) {
+                                    document.getElementById(graphIdsN[n]).style.fill = '#cf6830';
+                                }
+                            }
+                            if (playCount > 1) {
+                                for (var n = 0; n < graphIdsN.length; n++) {
+                                    document.getElementById(graphIdsN[n]).style.fill = '#cf6830';
+                                }
+                                for (var m = 0; m < graphIdsM.length; m++) {
+                                    document.getElementById(graphIdsM[m]).style.fill = 'grey';
+                                }
+                            }
+                        }
+                        else if (playCount == sumArrayLength) {
+                            var graphIdsM = idArray[playCount - 2];
+                            document.getElementById(txtIdN).style.backgroundColor = 'transparent';
+                            audioPlayer.removeEventListener("ended", handler);
+                            for (var m = 0; m < graphIdsM.length; m++) {
+                                document.getElementById(graphIdsM[m]).style.fill = 'grey';
+                            }
+                        }
+                    }
+                    //uni-trend lines
+                    else {
+                        if (playCount < sumArrayLength) {
+                            txtIdN = "A" + playCount;
+                            txtIdM = "A" + (playCount - 1);
+                            var text = document.getElementById(txtIdN).innerText;
+                            speakText(text);
+                            document.getElementById(txtIdM).style.backgroundColor = 'transparent';
+                            document.getElementById(txtIdN).style.backgroundColor = '#d9f6ff';
+                            if (playCount == 1) {
+                                for (var n = 0; n < graphIdsN.length; n++) {
+                                    document.getElementById(graphIdsN[n]).style.fill = '#cf6830';
+                                }
+                            }
+                        }
+                        else if (playCount == sumArrayLength) {
+                            var graphIdsM = idArray[playCount - 2];
+                            document.getElementById(txtIdN).style.backgroundColor = 'transparent';
+                            audioPlayer.removeEventListener("ended", handler);
+                            for (var m = 0; m < graphIdsM.length; m++) {
+                                document.getElementById(graphIdsM[m]).style.fill = 'grey';
+                            }
+                        }
+                    }
                 }
+                //bar graphs
                 else if (graphType == "bar") {
-                    barNarration(playCount);
                 }
             };
             audioPlayer.addEventListener("ended", handler);
-        }
-
-        function barNarration(playCount) {
-        }
-
-        function lineNarration(playCount, trendCount) {
-            if (trendCount > 1) {
-                var graphIds = idArray[playCount - 1]
-                if (playCount < sumArrayLength) {
-                    txtIdN = "A" + playCount;
-                    txtIdM = "A" + (playCount - 1);
-                    var text = document.getElementById(txtIdN).innerText;
-                    speakText(text);
-                    document.getElementById(txtIdM).style.backgroundColor = 'transparent';
-                    document.getElementById(txtIdN).style.backgroundColor = '#d9f6ff';
-                    if (playCount >= 1) {
-                        for (var n = 0; n < graphIds.length; n++) {
-                            console.log(graphIds[n]);
-                            document.getElementById(graphIds[n]).style.fill = '#cf6830';
-                        }
-                    }
-                }
-                else if (playCount == sumArrayLength) {
-                    document.getElementById(txtIdN).style.backgroundColor = 'transparent';
-                    audioplayCounter.removeEventListener("ended", handler);
-                    for (var n = 0; n < graphIds.length; n++) {
-                        console.log(graphIds[n]);
-                        document.getElementById(graphIds[n]).style.fill = 'grey';
-
-                    }
-                }
-            }
-
-            else {
-                var graphIds = idArray[0]
-                if (playCount < sumArrayLength) {
-                    txtIdN = "A" + playCount;
-                    txtIdM = "A" + (playCount - 1);
-                    var text = document.getElementById(txtIdN).innerText;
-                    speakText(text);
-                    document.getElementById(txtIdM).style.backgroundColor = 'transparent';
-                    document.getElementById(txtIdN).style.backgroundColor = '#d9f6ff';
-                    if (playCount >= 1) {
-                        for (var n = 0; n < graphIds.length; n++) {
-                            console.log(graphIds[n]);
-                            document.getElementById(graphIds[n]).style.fill = '#cf6830';
-                        }
-                    }
-                }
-                else if (playCount == sumArrayLength) {
-                    document.getElementById(txtIdN).style.backgroundColor = 'transparent';
-                    audioplayCounter.removeEventListener("ended", handler);
-                    for (var n = 0; n < graphIds.length; n++) {
-                        console.log(graphIds[n]);
-                        document.getElementById(graphIds[n]).style.fill = 'grey';
-                    }
-                }
-            }
         }
     </script>
 </head>
