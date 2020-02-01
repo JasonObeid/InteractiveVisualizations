@@ -3,14 +3,16 @@
     body {
         font: 14px helvetica;
     }
+
     text.label {
         font: 20px helvetica;
         font-weight: bold;
-
     }
+
     text {
         font: 18px helvetica;
     }
+
     .x.axis path {
         display: none;
     }
@@ -326,29 +328,81 @@
 
         function narrateSummary() {
             var audioPlayer = document.getElementById("audioPlayback");
-            var play = 0;
+            var playCount = 0;
             var txtID = "A0";
             var text = document.getElementById(txtID).innerText;
+            var trendCount = sumArrayLength - 1;
+            console.log(trendCount);
             speakText(text);
             document.getElementById(txtID).style.backgroundColor = '#d9f6ff';
             var handler = function () {
-                play = play + 1;
-                if (play < sumArrayLength) {
-                    txtIdN = "A" + play;
-                    txtIdM = "A" + (play - 1);
-                    var text = document.getElementById(txtIdN).innerText;
-                    speakText(text);
-                    document.getElementById(txtIdM).style.backgroundColor = 'transparent';
-                    document.getElementById(txtIdN).style.backgroundColor = '#d9f6ff';
+                if (graphType == "line") {
+                    lineNarration(playCount+1, trendCount);
                 }
-                else if (play == sumArrayLength) {
-                    document.getElementById(txtIdN).style.backgroundColor = 'transparent';
-                    audioPlayer.removeEventListener("ended", handler);
+                else if (graphType == "bar") {
+                    barNarration(playCount);
                 }
             };
             audioPlayer.addEventListener("ended", handler);
         }
 
+        function barNarration(playCount) {
+        }
+
+        function lineNarration(playCount, trendCount) {
+            if (trendCount > 1) {
+                var graphIds = idArray[playCount - 1]
+                if (playCount < sumArrayLength) {
+                    txtIdN = "A" + playCount;
+                    txtIdM = "A" + (playCount - 1);
+                    var text = document.getElementById(txtIdN).innerText;
+                    speakText(text);
+                    document.getElementById(txtIdM).style.backgroundColor = 'transparent';
+                    document.getElementById(txtIdN).style.backgroundColor = '#d9f6ff';
+                    if (playCount >= 1) {
+                        for (var n = 0; n < graphIds.length; n++) {
+                            console.log(graphIds[n]);
+                            document.getElementById(graphIds[n]).style.fill = '#cf6830';
+                        }
+                    }
+                }
+                else if (playCount == sumArrayLength) {
+                    document.getElementById(txtIdN).style.backgroundColor = 'transparent';
+                    audioplayCounter.removeEventListener("ended", handler);
+                    for (var n = 0; n < graphIds.length; n++) {
+                        console.log(graphIds[n]);
+                        document.getElementById(graphIds[n]).style.fill = 'grey';
+
+                    }
+                }
+            }
+
+            else {
+                var graphIds = idArray[0]
+                if (playCount < sumArrayLength) {
+                    txtIdN = "A" + playCount;
+                    txtIdM = "A" + (playCount - 1);
+                    var text = document.getElementById(txtIdN).innerText;
+                    speakText(text);
+                    document.getElementById(txtIdM).style.backgroundColor = 'transparent';
+                    document.getElementById(txtIdN).style.backgroundColor = '#d9f6ff';
+                    if (playCount >= 1) {
+                        for (var n = 0; n < graphIds.length; n++) {
+                            console.log(graphIds[n]);
+                            document.getElementById(graphIds[n]).style.fill = '#cf6830';
+                        }
+                    }
+                }
+                else if (playCount == sumArrayLength) {
+                    document.getElementById(txtIdN).style.backgroundColor = 'transparent';
+                    audioplayCounter.removeEventListener("ended", handler);
+                    for (var n = 0; n < graphIds.length; n++) {
+                        console.log(graphIds[n]);
+                        document.getElementById(graphIds[n]).style.fill = 'grey';
+                    }
+                }
+            }
+        }
     </script>
 </head>
 
@@ -432,7 +486,7 @@
                     svg.append("text")
                         .attr("transform",
                             "translate(" + (width / 2) + " ," +
-                        (height + margin.top + 10) + ")")
+                            (height + margin.top + 10) + ")")
                         .attr("class", "label")
                         .style("text-anchor", "middle")
                         .text(xAxis);

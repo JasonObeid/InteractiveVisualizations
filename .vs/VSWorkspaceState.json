@@ -4,8 +4,11 @@
     "\\data",
     "\\data\\d3",
     "\\data\\d3\\summaries",
-    "\\data\\kong"
+    "\\data\\kong",
+    "\\data\\kong\\data",
+    "\\data\\kong\\specs",
+    "\\data\\kong\\summaries"
   ],
-  "SelectedNode": "\\data\\kong",
+  "SelectedNode": "\\data\\d3\\summaries\\3001_1_summaryGOOD.json",
   "PreviewInSolutionExplorer": false
 }
