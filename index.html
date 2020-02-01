@@ -57,7 +57,10 @@
         font: 32px helvetica;
         text-align: center;
     }
-
+    p#summary {
+        font: 24px helvetica;
+        text-align: left;
+    }
     .button {
         display: inline-block;
         border-radius: 8px;
@@ -526,7 +529,7 @@
 
             function barGraph() {
                 var margin = { top: 30, right: 30, bottom: 50, left: 60 },
-                    width = 960 - margin.left - margin.right,
+                    width = 1200 - margin.left - margin.right,
                     height = 600 - margin.top - margin.bottom;
 
                 var x = d3.scaleBand()
@@ -649,16 +652,17 @@
             }
         </script>
     </section>
-    <table align="center" width="60%" cellpadding="5">
+    <table align="center" width="80%" cellpadding="5">
         <tr>
-            <td><h1 id="title"></h1></td>
+            <th><h1 id="title"></h1></th>
+            <th></th>
         </tr>
         <tr>
             <td><h3 id="summaryText">Hover over a point of data to hear its caption</h3></td>
+            <td rowspan="4"><p id="summary"></p></td>
         </tr>
-        <tr id="chart"></tr>
         <tr>
-            <td><p id="summary"></p></td>
+            <td id="chart"></td>
         </tr>
         <tr>
             <td>
