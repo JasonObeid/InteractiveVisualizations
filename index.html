@@ -54,7 +54,7 @@
     }
 
     #title {
-        font: 32px helvetica;
+        font: 36px helvetica;
         text-align: center;
     }
     p#summary {
@@ -111,7 +111,7 @@
         var xAxis = "";
         var yAxis = "";
 
-        var rootName = "7920_0";
+        var rootName = "3001_1";
         var jsonPath = "/InteractiveVisualizations/data/d3/specs/" + rootName + ".json";
         var csvPath = "/InteractiveVisualizations/data/d3/data/" + rootName + ".csv";
         var summaryPath = "/InteractiveVisualizations/data/d3/summaries/" + rootName + "_summary.json";
@@ -378,6 +378,7 @@
                     }
                     //uni-trend lines
                     else {
+                        console.log(playCount);
                         if (playCount < sumArrayLength) {
                             var txtIdN = "A" + playCount;
                             var txtIdM = "A" + (playCount - 1);
@@ -393,7 +394,8 @@
                         }
                         else if (playCount == sumArrayLength) {
                             var graphIdsM = idArray[playCount - 2];
-                            document.getElementById(txtIdN).style.backgroundColor = 'transparent';
+                            var txtIdM = "A" + (playCount - 1);
+                            document.getElementById(txtIdM).style.backgroundColor = 'transparent';
                             audioPlayer.removeEventListener("ended", handler);
                             for (var m = 0; m < graphIdsM.length; m++) {
                                 document.getElementById(graphIdsM[m]).style.fill = 'grey';
@@ -440,8 +442,8 @@
         <script>
             getMetaData();
             function lineGraph() {
-                var margin = { top: 30, right: 30, bottom: 50, left: 60 },
-                    width = 960 - margin.left - margin.right,
+                var margin = { top: 30, right: 40, bottom: 50, left: 100 },
+                    width = 1300 - margin.left - margin.right,
                     height = 600 - margin.top - margin.bottom;
 
                 // append the svg object to the body of the page
@@ -529,7 +531,7 @@
 
             function barGraph() {
                 var margin = { top: 30, right: 30, bottom: 50, left: 60 },
-                    width = 1200 - margin.left - margin.right,
+                    width = 1400 - margin.left - margin.right,
                     height = 600 - margin.top - margin.bottom;
 
                 var x = d3.scaleBand()
@@ -652,7 +654,7 @@
             }
         </script>
     </section>
-    <table align="center" width="80%" cellpadding="5">
+    <table align="left" width=100%" cellpadding="5">
         <tr>
             <th><h1 id="title"></h1></th>
             <th></th>
