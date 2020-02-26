@@ -1,4 +1,4 @@
-Paper Summaries(https://docs.google.com/presentation/d/1uE7_5ViVr4kkk2qs-9otmuOg7IQpYkZhLcgw5IOTeuw/edit?usp=sharing)
+[Paper Summaries Presentation](https://docs.google.com/presentation/d/1uE7_5ViVr4kkk2qs-9otmuOg7IQpYkZhLcgw5IOTeuw/edit?usp=sharing)
 
 
 [Enhanced Transformer Model for Data-to-Text Generation](https://www.aclweb.org/anthology/D19-5615.pdf)
