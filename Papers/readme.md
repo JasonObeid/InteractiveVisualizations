@@ -9,5 +9,12 @@ Github: https://github.com/gongliym/data2text-transformer
 Github: https://github.com/wanghm92/rw_fg
 
 
-[Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer](https://arxiv.org/abs/1910.10683)
+[(Google T5) Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer](https://arxiv.org/abs/1910.10683)
 Github: https://github.com/google-research/text-to-text-transfer-transformer
+
+
+[Pew Research Scraper](https://colab.research.google.com/drive/1E75CGgiPGOPrLIA4WcDKb4DTAHvtE29g#scrollTo=UMf2HjgcpIWU)
+
+[Transformer data2text running](https://colab.research.google.com/drive/1ijTqeGYjSLgv-smsj60po12VsGp4JUtM)
+
+[Attempt to add data2text task to Google T5](https://colab.research.google.com/drive/1jm_R8_40nDFLWilxgmM0LWoW2Uk18O97)
