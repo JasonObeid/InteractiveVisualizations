@@ -1,8 +1,8 @@
-https://docs.google.com/presentation/d/1uE7_5ViVr4kkk2qs-9otmuOg7IQpYkZhLcgw5IOTeuw/edit?usp=sharing
-
-Title: Enhanced Transformer Model for Data-to-Text Generation
-Paper URL: https://www.aclweb.org/anthology/D19-5615.pdf
-Github: https://github.com/gongliym/data2text-transformer
+<a>https://docs.google.com/presentation/d/1uE7_5ViVr4kkk2qs-9otmuOg7IQpYkZhLcgw5IOTeuw/edit?usp=sharing<a>
+</n>
+<a>Title: Enhanced Transformer Model for Data-to-Text Generation</a>
+<a>Paper URL: https://www.aclweb.org/anthology/D19-5615.pdf</a>
+<a>Github: https://github.com/gongliym/data2text-transformer</a>
 
 Title: Revisiting Challenges in Data-to-Text Generation with Fact Grounding
 Paper URL: https://arxiv.org/pdf/2001.03830.pdf
