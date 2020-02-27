@@ -13,8 +13,9 @@ Github: https://github.com/wanghm92/rw_fg
 Github: https://github.com/google-research/text-to-text-transfer-transformer
 
 
+Scripts Created:
 [Pew Research Scraper](https://colab.research.google.com/drive/1E75CGgiPGOPrLIA4WcDKb4DTAHvtE29g#scrollTo=UMf2HjgcpIWU)
 
-[Transformer data2text running](https://colab.research.google.com/drive/1ijTqeGYjSLgv-smsj60po12VsGp4JUtM)
+[Transformer data2text implementation](https://colab.research.google.com/drive/1ijTqeGYjSLgv-smsj60po12VsGp4JUtM)
 
 [Attempt to add data2text task to Google T5](https://colab.research.google.com/drive/1jm_R8_40nDFLWilxgmM0LWoW2Uk18O97)
